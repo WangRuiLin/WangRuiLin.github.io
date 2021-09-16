@@ -166,6 +166,10 @@
 <li>快慢指针法在链表中有着广泛的应用，比如说查找中间结点、检测链表是否包含环、判断是否为回文串、删除链表倒数第N个结点等等。</li>
 <li>多写多练</li>
 </ol>
+<p>参考链接：</p>
+<ol>
+<li><a href="https://github.com/wangzheng0822/algo">数据结构与算法之美相关代码</a></li>
+</ol>
 ]]></content>
       <categories>
         <category>数据结构与算法</category>
