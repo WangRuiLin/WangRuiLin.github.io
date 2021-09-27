@@ -1,6 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>数组</title>
+    <url>/2021/09/15/%E6%95%B0%E7%BB%84/</url>
+    <content><![CDATA[<p>​    作为一个程序员，数据结构与算法是基础知识。就好比是武侠小说里的“内功心法”，只有掌握了内功心法，才能以不变应万变。接下来会跟着极客时间里王争老师的专栏《数据结构与算法之美》，对这一块知识进行学习总结。</p>
+<span id="more"></span>
+
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><blockquote>
+<p>数组是一种线性表数据结构。它用一组连续的内存空间，来存储一组具有相同类型的数据。</p>
+</blockquote>
+<p>重点理解：</p>
+<ol>
+<li><p>线性表。每个线性表上的数据最多只有前和后两个方向。数组、链表、队列、栈等都是线性表结构。非线性表，比如二叉树、堆、图等。之所以叫非线性，是因为数据之间并不是简单的前后关系。</p>
+<p>这里我的理解是，数组和链表是两种最基础的数据结构。队列、栈等线性表结构和二叉树、堆等非线性表都可以通过数组和链表来实现。或者说数组和链表是数据在内存中的表示方式，要么是连续的(数组)，要么是非连续的(链表)。</p>
+</li>
+<li><p>连续的内存空间和相同类型的数据。优点：随机访问。缺点：插入删除数据时，为保证连续性，需要做数据搬移操作。</p>
+</li>
+</ol>
+<h2 id="随机访问"><a href="#随机访问" class="headerlink" title="随机访问"></a>随机访问</h2><p>计算机会给每个内存单元分配一个地址，计算机通过地址来访问内存中的数据。当计算机需要随机访问数组中的某个元素时，会通过寻址公式，来计算该元素存储的内存地址：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">a[i]_address = base_address + i * data_type_size</span><br></pre></td></tr></table></figure>
+
+<p>数组和链表的区别，很多人都回答说，“链表适合插入、删除，时间复杂度O(1)；数组适合查找，查找的复杂度为O(1)”。这种表述不准确，数组是适合查找操作，但是查找的时间复杂度并不是O(1)。即使是排好序的数组，使用二分查找，时间复杂度为O(logn)。所以，正确的表述是数组支持随机访问，根据下标随机访问的时间复杂度为O(1)。</p>
+<p>关于这两种表述方式，我理解之间的差异是，一个通过下标查找<code>value</code>，通过寻址方式，时间复杂度是O(1)；另一种是在数组中查找<code>value</code>，排好序的数据，通过二分查找，时间复杂度为O(logn)。(直观理解为字典里根据<code>key</code>查找<code>value</code>和遍历字典查找<code>value</code>的区别，这种理解方式可能不太恰当)</p>
+<h2 id="低效的“插入”和“删除”"><a href="#低效的“插入”和“删除”" class="headerlink" title="低效的“插入”和“删除”"></a>低效的“插入”和“删除”</h2><h3 id="插入操作"><a href="#插入操作" class="headerlink" title="插入操作"></a>插入操作</h3><p>平均时间复杂度O(n)。计算方式：<code>(1+2+....+n)/n=O(n)</code></p>
+<p>改进：将要插入指定位置的原元素放到最后，然后将新元素插入指定位置。时间复杂度O(1)</p>
+<h3 id="删除操作"><a href="#删除操作" class="headerlink" title="删除操作"></a>删除操作</h3><p>平均时间复杂度O(n)</p>
+<p>改进：先记录下已经删除的数据，当数组没有更多空间存储数据时，再触发执行一次真正的删除操作(JVM标记清除垃圾回收算法的核心思想)。时间复杂度视情况而定</p>
+<h2 id="警惕数组的访问越界问题"><a href="#警惕数组的访问越界问题" class="headerlink" title="警惕数组的访问越界问题"></a>警惕数组的访问越界问题</h2><p>在C语言中，只要不是访问受限的内存，所有的内存空间都是可以自由访问的。</p>
+<p>数组越界在C语言中是一种未决行为，并没有规定数组访问越界时编译器应该如何处理。因为访问数组的本质就是访问一段连续内存，只要数组通过偏移计算得到的内存地址是可用的，那么程序就可能不会报任何错误。</p>
+<p>很多计算机病毒也正是利用到了代码中的数组越界可以访问非法地址的漏洞，来攻击系统，所以写代码的时候一定要警惕数组越界。但并非所有的语言都像C语言一样，把数组越界检测的工作丢给程序员来做，像Java本身就会做越界检查，会抛出越界异常。</p>
+<p>文中的代码我在Mac终端通过<code>gcc</code>编译后执行，打印了四次<code>hello world</code>后异常退出，如图，</p>
+<p><img src="index_out_of_bound.jpeg"></p>
+<p>这个问题在文章后的评论里找到了答案：<code>gcc</code>有一个编译选项(<code>-fno-stack-protectot</code>)用于关闭堆栈保护功能。默认情况下启动了堆栈保护，不管<code>i</code>声明在前还是在后，<code>i</code>都会在数组之后压栈，只会循环四次；如果关闭堆栈保护功能，则会出现死循环。C语言代码如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">int</span> arr[<span class="number">3</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	<span class="keyword">for</span>(; i&lt;=<span class="number">3</span>; i++)&#123;</span><br><span class="line">		arr[i] = <span class="number">0</span>;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;hello world\n&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="容器能否完全替代数组"><a href="#容器能否完全替代数组" class="headerlink" title="容器能否完全替代数组"></a>容器能否完全替代数组</h2><p>针对数组类型，很多语言都提供了容器类，比如<code>Java</code>中的<code>ArrayList</code>、<code>C++ STL</code>中的<code>vector</code>。我的理解，平时<code>Python</code>中经常使用的<code>list</code>、<code>dict</code>、<code>set</code>等提供操作<code>api</code>的类都称之为容器类。</p>
+<p><code>ArrayList</code>最大的优势就是<strong>可以将很多数组操作的细节封装起来</strong>。比如数组插入、删除数据时需要搬移其他数据等。另外，还有一个优势，就是支持<strong>支持动态扩容</strong>。</p>
+<p>需要注意的是，扩容操作涉及内存申请和数据搬移，是比较耗时的，所以，如果事先能确定需要存储的数据大小，最好在<strong>创建<code>ArrayList</code>的时候事先指定数据大小</strong></p>
+<p>总结：</p>
+<ol>
+<li><code>Java ArrayList</code>无法存储基本数据类型，比如<code>int</code>、<code>long</code>，需要封装为<code>Integer</code>、<code>Long</code>类，而<code>Autoboxing(自动装箱)</code>、<code>Unboxing(自动拆箱)</code>则有一定的性能消耗，所以如果特别关注性能，或希望使用基本数据类型，就可以选用数组。</li>
+<li>如果数据大小事先已知，并且对数据的操作非常简单，用不到<code>ArrayList</code>提供的大部分方法，也可以直接使用数组。</li>
+<li>当表示多维数组时，用数组往往会更加直观。比如，<code>Object[][] array</code>；而用容器的话，<code>ArrayList&lt;ArrayList&lt;object&gt;&gt; array</code></li>
+</ol>
+<p>对于业务开发，直接使用容器就足够了，省时省力。毕竟损耗一丢丢性能，完全不会影响到系统整体的性能，但是如果做一些特别底层的开发，比如开发网络框架，性能的优化需要做到极致，这个时候数组就会优于容器。</p>
+<h2 id="解答开篇"><a href="#解答开篇" class="headerlink" title="解答开篇"></a>解答开篇</h2><p>为什么大多数编程语言中，数组要从0开始编号，而不是从1开始呢？</p>
+<ol>
+<li>通过寻址公式来看，从0开始编号，<code>a[k]_address = base_address + k * data_type_size</code>；从1开始编号，<code>a[k]_address = base_address + (k-1) * data_type_size</code>。不难发现，从1开始编号，每次随机访问数组元素都多了一次减法元素，对于CPU来说，就是多了一次减法指令。数组作为非常基础的数据结构，通过下标随机访问数组元素又是其非常基础的编程操作，效率的优化就要尽可能做到极致。</li>
+<li>历史原因。C语言设计者用0开始计数数组下标，之后的Java、JavaScript等高级语言都效仿了C语言，或者说，为了在一定程度上减少C语言程序员学习Java的学习成本，因此继续沿用了从0开始计数的习惯。</li>
+</ol>
+<h2 id="课后思考"><a href="#课后思考" class="headerlink" title="课后思考"></a>课后思考</h2><ol>
+<li><p>JVM的标记清除垃圾回收算法的核心理念</p>
+<p>大多数主流虚拟机采用可达性分析算法来判断对象是否存活，在标记阶段，会遍历所有的<code>GC ROOTS</code>，将所有的<code>GC ROOTS</code>可达的对象标记为存活。只有当标记工作完成后，清理工作才会开始。</p>
+<p>不足：1. 效率问题，标记和清理效率都不高，但是当知道只有少数垃圾产生时会很高效。2.空间问题，会产生不连续的内存空间碎片。</p>
+<p>联想：Python中的垃圾回收机制：主要通过引用计数法进行垃圾回收，通过“标记-清除”解决容器对象可能产生的循环引用问题；通过“分代回收”以空间换时间的方法提高垃圾回收率</p>
+</li>
+<li><p>二维数组的内存寻址公式</p>
+<p>对于<code>m*n</code>的数组，<code>a[i][j] (i&lt;m, j&lt;n)</code>的地址为：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">address = base_address + (i*n + j) * data_type_size</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>参考链接：</p>
+<ol>
+<li><p><a href="https://zhuanlan.zhihu.com/p/83251959">Python垃圾回收机制！非常实用</a></p>
+</li>
+<li><p><a href="https://blog.csdn.net/qq_42019874/article/details/111599687">二维数组和多维数组的本质及寻址方式</a></p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>极客时间</tag>
+        <tag>数组</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>栈</title>
     <url>/2021/09/18/%E6%A0%88/</url>
     <content><![CDATA[<p>今天来学习栈。</p>
@@ -92,6 +167,147 @@
       <tags>
         <tag>极客时间</tag>
         <tag>栈</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>链表(下)</title>
+    <url>/2021/09/17/%E9%93%BE%E8%A1%A8-%E4%B8%8B/</url>
+    <content><![CDATA[<p>链表这块知识理解起来简单，代码实现起来，容易出错，谁写谁知道，所以就有了链表(下)。</p>
+<span id="more"></span>
+
+<h2 id="写链表代码的技巧"><a href="#写链表代码的技巧" class="headerlink" title="写链表代码的技巧"></a>写链表代码的技巧</h2><h3 id="理解指针或引用的含义"><a href="#理解指针或引用的含义" class="headerlink" title="理解指针或引用的含义"></a>理解指针或引用的含义</h3><p><strong>将某个变量赋值给指针，实际上就是将这个变量的地址赋值给指针，或者反过来说，指针里存储了这个变量的内存地址，指向了这个变量，通过指针就能找到这个变量。</strong></p>
+<p>指针，英文定义，<code>A pointer is a variable whose value is the address of another variable.</code></p>
+<h3 id="警惕指针丢失和内存泄漏"><a href="#警惕指针丢失和内存泄漏" class="headerlink" title="警惕指针丢失和内存泄漏"></a>警惕指针丢失和内存泄漏</h3><p>比如，在<code>a</code>、<code>b</code>两个结点之间插入一个结点<code>c</code>，一定是先执行<code>c-&gt;next=a-&gt;next</code>，先把结点<code>c</code>指向结点<code>b</code>，然后再将结点<code>a</code>指向结点<code>c</code>，即<code>a-&gt;next=c</code>。如果顺序颠倒了，就会造成结点<code>b</code>的丢失，链表分成了两半，进而造成内存泄漏。因此，<strong>在插入结点时，一定要注意操作的顺序</strong>。</p>
+<p><strong>删除链表结点时，也一定要记得手动释放内存空间</strong>，否则也会出现内存泄漏的情况。当然，对于像<code>Java</code>这种虚拟机自动管理内存的编程语言来说，就不需要考虑那么多了。</p>
+<h3 id="利用哨兵简化实现难度"><a href="#利用哨兵简化实现难度" class="headerlink" title="利用哨兵简化实现难度"></a>利用哨兵简化实现难度</h3><p>非哨兵模式下链表的插入，比如在<code>p</code>结点后插入一个新结点</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 正常情况</span></span><br><span class="line">new_node.<span class="built_in">next</span> = p.<span class="built_in">next</span></span><br><span class="line">p.<span class="built_in">next</span> = new_node</span><br><span class="line"><span class="comment"># 边界情况，比如向空链表中插入第一个结点</span></span><br><span class="line"><span class="keyword">if</span> (head == <span class="literal">None</span>)&#123;head = new_node&#125;</span><br></pre></td></tr></table></figure>
+
+<p>非哨兵模式下链表的删除，比如删除结点<code>p</code>的后继结点</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 正常情况</span></span><br><span class="line">p.<span class="built_in">next</span> = p.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line"><span class="comment"># 边界情况，比如删除最后一个结点</span></span><br><span class="line">p.<span class="built_in">next</span> = <span class="literal">None</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>针对链表的插入、删除操作，需要对插入第一个结点和删除最后一个结点的情况进行特殊处理。</strong></p>
+<p>为了解决边界问题，引入哨兵结点。</p>
+<p>哨兵结点，结点本身不存储数据，指定链表头结点，称为新的头结点，如图所示，</p>
+<p><img src="sentinel.webp"></p>
+<p>带有哨兵结点的链表叫<strong>带头链表</strong>；没有哨兵结点的链表叫做<strong>不带头链表</strong>。</p>
+<p>因为哨兵结点一直存在，所以插入第一个节点和插入其他结点，删除最后一个结点和删除其他结点，都可以统一为相同的代码实现逻辑。</p>
+<p>不信的话，自己画画图，理解一下代码，发现确实是真的耶</p>
+<h3 id="重点留意边界条件处理"><a href="#重点留意边界条件处理" class="headerlink" title="重点留意边界条件处理"></a>重点留意边界条件处理</h3><p>检查链表代码是否正确的边界条件有这样几个：</p>
+<ul>
+<li>如果链表为空时，代码是否能正常工作</li>
+<li>如果链表只包含一个结点时，代码是否能正常工作</li>
+<li>如果链表只包含两个结点时，代码是否能正常工作</li>
+<li>代码逻辑在处理头结点和尾结点的时候，是否能正常工作</li>
+</ul>
+<h3 id="举例画图，辅助思考"><a href="#举例画图，辅助思考" class="headerlink" title="举例画图，辅助思考"></a>举例画图，辅助思考</h3><p>举例法和画图法</p>
+<h3 id="多写多练，没有捷径"><a href="#多写多练，没有捷径" class="headerlink" title="多写多练，没有捷径"></a>多写多练，没有捷径</h3><p>5个常见的链表操作</p>
+<ul>
+<li>单链表反转</li>
+<li>链表中环的检测</li>
+<li>两个有序的链表合并</li>
+<li>删除链表倒数第n个结点</li>
+<li>求链表的中间结点</li>
+</ul>
+<p>其实除了两个有序的链表合并，其余的在链表上(上)都写过了，总结起来就是1.快慢指针2.反转相邻的结点。上节课后思考判断回文串这一道题目就把这两个知识点都考查到了，简直是妙啊！</p>
+<h2 id="课后思考"><a href="#课后思考" class="headerlink" title="课后思考"></a>课后思考</h2><p>哨兵模式在其他场景上的应用。</p>
+<p>暂时没想到，后续用到了再来补充吧=.=</p>
+<h2 id="合并两个有序链表"><a href="#合并两个有序链表" class="headerlink" title="合并两个有序链表"></a>合并两个有序链表</h2><h3 id="遍历实现"><a href="#遍历实现" class="headerlink" title="遍历实现"></a>遍历实现</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_sorted_list</span>(<span class="params">l1: Node, l2: Node</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        合并两个有序链表</span></span><br><span class="line"><span class="string">        时间复杂度O(m)+O(n)</span></span><br><span class="line"><span class="string">    :param l1: 链表1头结点</span></span><br><span class="line"><span class="string">    :param l2: 链表2头结点</span></span><br><span class="line"><span class="string">    :return: 合并后链表的头结点</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    node = Node(data=-<span class="number">1</span>)</span><br><span class="line">    <span class="comment"># 需要一个变量保存头结点</span></span><br><span class="line">    head = node</span><br><span class="line">    <span class="keyword">while</span> l1 <span class="keyword">and</span> l2:</span><br><span class="line">        <span class="keyword">if</span> l1.data &lt;= l2.data:</span><br><span class="line">            node.<span class="built_in">next</span> = l1</span><br><span class="line">            <span class="comment"># 后移链表1结点</span></span><br><span class="line">            l1 = l1.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            node.<span class="built_in">next</span> = l2</span><br><span class="line">            <span class="comment"># 后移链表2结点</span></span><br><span class="line">            l2 = l2.<span class="built_in">next</span></span><br><span class="line">        node = node.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 合并 未合并完的链表</span></span><br><span class="line">    node.<span class="built_in">next</span> = l1 <span class="keyword">if</span> l1 <span class="keyword">else</span> l2</span><br><span class="line">    <span class="keyword">return</span> head.<span class="built_in">next</span></span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    s = SingleLinkedList()</span><br><span class="line"></span><br><span class="line">    s.insert_to_head(<span class="number">5</span>)</span><br><span class="line">    s.insert_to_head(<span class="number">3</span>)</span><br><span class="line">    s.insert_to_head(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    p = SingleLinkedList()</span><br><span class="line">    p.insert_to_head(<span class="number">6</span>)</span><br><span class="line">    p.insert_to_head(<span class="number">5</span>)</span><br><span class="line">    p.insert_to_head(<span class="number">4</span>)</span><br><span class="line">    p.insert_to_head(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">    q = merge_sorted_list(s.get_head_node(), p.get_head_node())</span><br></pre></td></tr></table></figure>
+
+<h3 id="递归实现"><a href="#递归实现" class="headerlink" title="递归实现"></a>递归实现</h3><p>代码先放到这，等学完递归在回过头来看。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_sorted_list2</span>(<span class="params">l1: Node, l2: Node</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        合并两个有序链表</span></span><br><span class="line"><span class="string">        主要思路：</span></span><br><span class="line"><span class="string">        	list1[0] + merge(list1[1], list2[0]) 当list1[0]&lt;list2[0]</span></span><br><span class="line"><span class="string">          list2[0] + merge(list1[0], list2[1]) otherwise</span></span><br><span class="line"><span class="string">    :param l1: 链表1头结点</span></span><br><span class="line"><span class="string">    :param l2: 链表2头结点</span></span><br><span class="line"><span class="string">    :return: 合并后链表的头结点</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> l1:</span><br><span class="line">        <span class="keyword">return</span> l2</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> l2:</span><br><span class="line">        <span class="keyword">return</span> l1</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> l1.data &lt;= l2.data:</span><br><span class="line">        l1.<span class="built_in">next</span> = merge_sorted_list(l1.<span class="built_in">next</span>, l2)</span><br><span class="line">        <span class="keyword">return</span> l1</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        l2.<span class="built_in">next</span> = merge_sorted_list(l1, l2.<span class="built_in">next</span>)</span><br><span class="line">        <span class="keyword">return</span> l2</span><br></pre></td></tr></table></figure>
+
+<h2 id="LRU缓存算法"><a href="#LRU缓存算法" class="headerlink" title="LRU缓存算法"></a>LRU缓存算法</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, x, y</span>):</span></span><br><span class="line">        self.key = x</span><br><span class="line">        self.value = y</span><br><span class="line">        self.<span class="built_in">next</span> = <span class="literal">None</span></span><br><span class="line">        self.prev = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, capacity: <span class="built_in">int</span></span>):</span></span><br><span class="line">        self.cap = capacity</span><br><span class="line">        <span class="comment"># 存储key和node</span></span><br><span class="line">        self.hkeys = &#123;&#125;</span><br><span class="line">        <span class="comment"># 哨兵结点 避免考虑边界问题</span></span><br><span class="line">        self.top = Node(<span class="literal">None</span>, -<span class="number">1</span>)</span><br><span class="line">        self.tail = Node(<span class="literal">None</span>, -<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        self.top.<span class="built_in">next</span> = self.tail</span><br><span class="line">        self.tail.prev = self.top</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, key: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.hkeys.keys():</span><br><span class="line">            <span class="comment"># 1.获取结点</span></span><br><span class="line">            cur = self.hkeys[key]</span><br><span class="line">            <span class="comment"># 2.从当前位置拿出</span></span><br><span class="line">            cur.prev.<span class="built_in">next</span> = cur.<span class="built_in">next</span></span><br><span class="line">            cur.<span class="built_in">next</span>.prev = cur.prev</span><br><span class="line">            <span class="comment"># 3.放到链表头部</span></span><br><span class="line">            <span class="comment"># 3.1 保存top后面的结点</span></span><br><span class="line">            tmp = self.top.<span class="built_in">next</span></span><br><span class="line">            <span class="comment"># 3.2 top和cur绑定</span></span><br><span class="line">            self.top.<span class="built_in">next</span> = cur</span><br><span class="line">            cur.prev = self.top</span><br><span class="line">            <span class="comment"># 3.3 cur和tmp绑定</span></span><br><span class="line">            cur.<span class="built_in">next</span> = tmp</span><br><span class="line">            tmp.prev = cur</span><br><span class="line">            <span class="keyword">return</span> self.hkeys[key].value</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span>(<span class="params">self, key: <span class="built_in">int</span>, value: <span class="built_in">int</span></span>) -&gt; <span class="literal">None</span>:</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.hkeys.keys():</span><br><span class="line">            <span class="comment"># 1.获取结点</span></span><br><span class="line">            cur = self.hkeys[key]</span><br><span class="line">            <span class="comment"># 修改value值</span></span><br><span class="line">            cur.value = value</span><br><span class="line">            <span class="comment"># 2.跳出原位置</span></span><br><span class="line">            cur.prev.<span class="built_in">next</span> = cur.<span class="built_in">next</span></span><br><span class="line">            cur.<span class="built_in">next</span>.prev = cur.prev</span><br><span class="line">            <span class="comment"># 3.将cur放到头结点</span></span><br><span class="line">            top_node = self.top.<span class="built_in">next</span></span><br><span class="line">            self.top.<span class="built_in">next</span> = cur</span><br><span class="line">            cur.prev = self.top</span><br><span class="line">            cur.<span class="built_in">next</span> = top_node</span><br><span class="line">            top_node.prev = cur</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(self.hkeys.keys()) &gt; self.cap:</span><br><span class="line">                <span class="comment"># 从哈希表删除key</span></span><br><span class="line">                self.hkeys.pop(self.tail.prev.key)</span><br><span class="line">                <span class="comment"># 去掉了后继指针</span></span><br><span class="line">                self.tail.prev.prev.<span class="built_in">next</span> = self.tail</span><br><span class="line">                <span class="comment"># 修改尾结点前驱指针，self.tail.prev.prev有点懵的</span></span><br><span class="line">                self.tail.prev = self.tail.prev.prev</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 新增结点</span></span><br><span class="line">            cur = Node(key, value)</span><br><span class="line">            self.hkeys[key] = cur</span><br><span class="line">            <span class="comment"># 最近用过的放到链表头部</span></span><br><span class="line">            <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">                我第一次写的</span></span><br><span class="line"><span class="string">                cur.next = self.top.next</span></span><br><span class="line"><span class="string">                self.top.prev = cur</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">                self.top.next = cur</span></span><br><span class="line"><span class="string">                cur.prev = self.top</span></span><br><span class="line"><span class="string">            &quot;&quot;&quot;</span></span><br><span class="line">            <span class="comment"># 利用tmp保留top下一个结点</span></span><br><span class="line">            tmp = self.top.<span class="built_in">next</span>  </span><br><span class="line">            cur.<span class="built_in">next</span> = tmp</span><br><span class="line">            tmp.prev = cur</span><br><span class="line"></span><br><span class="line">            self.top.<span class="built_in">next</span> = cur</span><br><span class="line">            cur.prev = self.top</span><br></pre></td></tr></table></figure>
+
+<h3 id="感受"><a href="#感受" class="headerlink" title="感受"></a>感受</h3><ol>
+<li><p>写起来好像也没想象中那么难，可能是因为用到哨兵结点，不需要考虑边界问题。</p>
+</li>
+<li><p>主要操作包括：结点从当前位置取出、头部插入结点。</p>
+</li>
+<li><p>操作之间不需要考虑先后顺序，比如结点跳出原位置，</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 结点跳出原位置</span></span><br><span class="line">cur.<span class="built_in">next</span>.prev = cur.prev</span><br><span class="line">cur.prev.<span class="built_in">next</span> = cur.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 链表头部插入结点</span></span><br><span class="line">tmp = self.top.<span class="built_in">next</span></span><br><span class="line">cur.<span class="built_in">next</span> = tmp</span><br><span class="line">tmp.prev = cur</span><br><span class="line"></span><br><span class="line">self.top.<span class="built_in">next</span> = cur</span><br><span class="line">cur.prev = self.top</span><br></pre></td></tr></table></figure>
+
+<p>于是，为了验证这个观点，写一个简单的双向链表<code>demo</code>验证一下，无论怎么更换<code>insert_node_from_head()</code>方法中后四行代码的顺序，结果都是一样的。如果有不对的地方，欢迎指教哈=。=</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        self.value = value</span><br><span class="line">        self.<span class="built_in">next</span> = <span class="literal">None</span></span><br><span class="line">        self.prev = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TwoWayLoop</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.top = Node(value=-<span class="number">1</span>)</span><br><span class="line">        self.tail = Node(value=-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        self.top.<span class="built_in">next</span> = self.tail</span><br><span class="line">        self.tail.prev = self.top</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">insert_node_from_head</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        node = Node(value=value)</span><br><span class="line"></span><br><span class="line">        tmp = self.top.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line">        tmp.prev = node</span><br><span class="line">        node.prev = self.top</span><br><span class="line">        self.top.<span class="built_in">next</span> = node</span><br><span class="line">        node.<span class="built_in">next</span> = tmp</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">delete_node</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">            暂时没想好怎么写</span></span><br><span class="line"><span class="string">        :return: </span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        node = self.top.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> node.<span class="built_in">next</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">print_all</span>(<span class="params">self</span>):</span></span><br><span class="line">        node = self.top.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> node.<span class="built_in">next</span>:</span><br><span class="line">            <span class="built_in">print</span>(node.value)</span><br><span class="line">            node = node.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    t = TwoWayLoop()</span><br><span class="line"></span><br><span class="line">    t.insert_node_from_head(<span class="number">4</span>)</span><br><span class="line">    t.insert_node_from_head(<span class="number">3</span>)</span><br><span class="line">    t.insert_node_from_head(<span class="number">2</span>)</span><br><span class="line">    t.insert_node_from_head(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    t.print_all()  <span class="comment"># 1-&gt;2-&gt;3-&gt;4</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="附：获取类对象的私有属性"><a href="#附：获取类对象的私有属性" class="headerlink" title="附：获取类对象的私有属性"></a>附：获取类对象的私有属性</h2><p>在合并两个有序链表中，需要获取链表的头结点。上篇文章代码中，单链表的<code>SingleLinkedList</code>中的头结点初始化时定义为私有属性<code>self.__head=None</code>，如果直接通过实例对象获取<code>__head</code>会抛出<code>AttributeError</code>异常。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SingleLinkedList</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">    self.__head = <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  s = SingleLinkedList()</span><br><span class="line">  s.insert_to_head(<span class="number">1</span>)</span><br><span class="line">  <span class="built_in">print</span>(s.__head)  <span class="comment"># AttributeError: &#x27;SingleLinkedList&#x27; object has no attribute &#x27;__head&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="正确的打开方式"><a href="#正确的打开方式" class="headerlink" title="正确的打开方式"></a>正确的打开方式</h3><ol>
+<li>通过定义一个方法获取私有属性</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SingleLinkedList</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">    self.__head = <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">get_head_node</span>(<span class="params">self</span>):</span></span><br><span class="line">    <span class="keyword">return</span> self.__head</span><br><span class="line">    </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  s = SingleLinkedList()</span><br><span class="line">  s.insert_to_head(<span class="number">1</span>)</span><br><span class="line">  <span class="built_in">print</span>(s.get_head_node().data)  <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>通过<code>property</code>将方法转化为属性</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SingleLinkedList</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">    self.__head = <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">get_head_node</span>(<span class="params">self</span>):</span></span><br><span class="line">    <span class="keyword">return</span> self.__head</span><br><span class="line"></span><br><span class="line">  head = <span class="built_in">property</span>(get_head_node)</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  s = SingleLinkedList()</span><br><span class="line">  s.insert_to_head(<span class="number">1</span>)</span><br><span class="line">  <span class="built_in">print</span>(s.head.data)  <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>通过<code>property</code>装饰器</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SingleLinkedList</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">    self.__head = <span class="literal">None</span></span><br><span class="line">   </span><br><span class="line"><span class="meta">  @property</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">head</span>(<span class="params">self</span>):</span></span><br><span class="line">  	<span class="keyword">return</span> self.__head</span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  s = SingleLinkedList()</span><br><span class="line">  s.insert_to_head(<span class="number">1</span>)</span><br><span class="line">  <span class="built_in">print</span>(s.head.data)  <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
+
+<p>参考链接：</p>
+<ol>
+<li><a href="https://zhuanlan.zhihu.com/p/53469919">python变量——单下划线和双下划线</a></li>
+<li><a href="https://www.runoob.com/python/python-func-property.html">Python property() 函数</a></li>
+<li><a href="https://blog.csdn.net/z_feng12489/article/details/106105227">合并两个有序链表（python）</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>极客时间</tag>
+        <tag>链表</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>递归</title>
+    <url>/2021/09/27/%E9%80%92%E5%BD%92/</url>
+    <content><![CDATA[<p>今天来学习递归。</p>
+<span id="more"></span>
+
+<h2 id="如何理解“递归”"><a href="#如何理解“递归”" class="headerlink" title="如何理解“递归”"></a>如何理解“递归”</h2><p>数据结构和算法中两个最难理解的知识点，一个是动态规划，另一个是递归。</p>
+<p>递归是一种应用非常广泛的算法(或者编程技巧)。比如，合并两个有序链表、斐波那契数列等等。</p>
+<p>去的过程称为“递”，回来的过程称为“归”。</p>
+<h2 id="递归需要满足的三个条件"><a href="#递归需要满足的三个条件" class="headerlink" title="递归需要满足的三个条件"></a>递归需要满足的三个条件</h2><ol>
+<li>一个问题的解可以分解为几个子问题的解。子问题就是数据规模更小的问题。</li>
+<li>这个问题与分解之后的子问题，除了数据规模不同，求解思路完全一样。</li>
+<li>存在递归终止条件</li>
+</ol>
+<h2 id="如何编写递归代码"><a href="#如何编写递归代码" class="headerlink" title="如何编写递归代码"></a>如何编写递归代码</h2><p>写递归代码最关键的是<strong>写出递归公式，找到终止条件</strong>。</p>
+<p>写递归代码的关键就是找到如何将大问题分解为小问题的规律，并且基于此写出递归公式，然后再敲定终止条件，最后将递推公式和终止条件翻译为代码。</p>
+<p>编写递归代码的关键是，只要遇到递归，我们就把它抽象成一个递推公式，不用想一层层的调用关系，不要试图用人脑去分解递归的每个步骤。</p>
+<h2 id="递归代码要警惕堆栈溢出"><a href="#递归代码要警惕堆栈溢出" class="headerlink" title="递归代码要警惕堆栈溢出"></a>递归代码要警惕堆栈溢出</h2><p>原因：函数调用会使用栈来保存临时变量。每调用一个函数，都会将临时变量封装为栈帧压入内存栈，等函数执行完成返回时，才出栈。系统栈或者虚拟机栈空间一般都不大。如果递归求解的数据规模很大，调用层次很深，一直压入栈，就会有堆栈溢出的风险。</p>
+<p>解决方法：在代码中限制递归调用的最大深度。但这种做法并不能完全解决问题，因为最大允许的递归深度跟当前线程剩余的栈空间大小有关，事先无法计算。如果实时计算，代码过于复杂，就会影响代码的可读性。所以，如果最大深度比较小，比如10、50，就可以用这种方法，否则这种方法并不很实用。</p>
+<p>将递归代码改为循环处理以避免堆栈溢出。</p>
+<h2 id="递归代码要警惕重复计算"><a href="#递归代码要警惕重复计算" class="headerlink" title="递归代码要警惕重复计算"></a>递归代码要警惕重复计算</h2><p>为了避免重复计算，可以通过一个数据结构(散列表)来保存已经求解过得<code>f(k)</code>。当递归调用到<code>f(k)</code>时，先看下是否已经求解过了。如果是，则直接从散列表中取值返回，不需要重复计算。</p>
+<h2 id="将递归代码改写为非递归代码"><a href="#将递归代码改写为非递归代码" class="headerlink" title="将递归代码改写为非递归代码"></a>将递归代码改写为非递归代码</h2><p>递归代码有利有弊，利是递归代码的表达能力很强，写起来非常简洁；而弊就是空间复杂度高、有堆栈溢出的风险、存在重复计算、过多的函数调用会耗时较多等问题。</p>
+<p><code>f(x)=f(x-1)+1</code>改写为非递归代码</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span>(<span class="params">n</span>):</span></span><br><span class="line">    result = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>, n+<span class="number">1</span>):</span><br><span class="line">        result = result + <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
+
+<p>笼统的讲，所有的递归代码都可以改为迭代循环的非递归写法。因为递归本身就是借助栈来实现的，只不过我们使用的栈是系统或者虚拟机本身提供的，我们没有感知罢了。如果我们自己在内存堆上实现栈，手动模拟入栈、出栈过程，这样任何递归代码都可以改写成看上去不是递归代码的样子。</p>
+<h2 id="解答开篇"><a href="#解答开篇" class="headerlink" title="解答开篇"></a>解答开篇</h2><p>给定一个用户ID，如何查找这个用户的“最终推荐人”。伪代码如下，</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">findRootReferrerId</span><span class="params">(<span class="keyword">long</span> actorId)</span> </span>&#123;</span><br><span class="line">  Long referrerId = select referrer_id from [table] where actor_id = actorId;</span><br><span class="line">  <span class="keyword">if</span> (referrerId == <span class="keyword">null</span>) <span class="keyword">return</span> actorId;</span><br><span class="line">  <span class="keyword">return</span> findRootReferrerId(referrerId);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>存在的问题：</p>
+<ol>
+<li>递归很深，存在堆栈溢出的风险(限制递归次数)</li>
+<li>如果数据库里存在脏数据，还需要处理由此产生的无限递归问题，如何检测环？(限制递归次数、快慢指针检测环)</li>
+</ol>
+<h2 id="课后思考"><a href="#课后思考" class="headerlink" title="课后思考"></a>课后思考</h2><p>对于递归代码，有什么好的调试方法？(答案来自评论区)</p>
+<ul>
+<li>打印日志发现，递归值</li>
+<li>结合条件断点进行调试</li>
+</ul>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>极客时间</tag>
+        <tag>递归</tag>
       </tags>
   </entry>
   <entry>
@@ -199,176 +415,8 @@
       </tags>
   </entry>
   <entry>
-    <title>数组</title>
-    <url>/2021/09/15/%E6%95%B0%E7%BB%84/</url>
-    <content><![CDATA[<p>​    作为一个程序员，数据结构与算法是基础知识。就好比是武侠小说里的“内功心法”，只有掌握了内功心法，才能以不变应万变。接下来会跟着极客时间里王争老师的专栏《数据结构与算法之美》，对这一块知识进行学习总结。</p>
-<span id="more"></span>
-
-<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><blockquote>
-<p>数组是一种线性表数据结构。它用一组连续的内存空间，来存储一组具有相同类型的数据。</p>
-</blockquote>
-<p>重点理解：</p>
-<ol>
-<li><p>线性表。每个线性表上的数据最多只有前和后两个方向。数组、链表、队列、栈等都是线性表结构。非线性表，比如二叉树、堆、图等。之所以叫非线性，是因为数据之间并不是简单的前后关系。</p>
-<p>这里我的理解是，数组和链表是两种最基础的数据结构。队列、栈等线性表结构和二叉树、堆等非线性表都可以通过数组和链表来实现。或者说数组和链表是数据在内存中的表示方式，要么是连续的(数组)，要么是非连续的(链表)。</p>
-</li>
-<li><p>连续的内存空间和相同类型的数据。优点：随机访问。缺点：插入删除数据时，为保证连续性，需要做数据搬移操作。</p>
-</li>
-</ol>
-<h2 id="随机访问"><a href="#随机访问" class="headerlink" title="随机访问"></a>随机访问</h2><p>计算机会给每个内存单元分配一个地址，计算机通过地址来访问内存中的数据。当计算机需要随机访问数组中的某个元素时，会通过寻址公式，来计算该元素存储的内存地址：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">a[i]_address = base_address + i * data_type_size</span><br></pre></td></tr></table></figure>
-
-<p>数组和链表的区别，很多人都回答说，“链表适合插入、删除，时间复杂度O(1)；数组适合查找，查找的复杂度为O(1)”。这种表述不准确，数组是适合查找操作，但是查找的时间复杂度并不是O(1)。即使是排好序的数组，使用二分查找，时间复杂度为O(logn)。所以，正确的表述是数组支持随机访问，根据下标随机访问的时间复杂度为O(1)。</p>
-<p>关于这两种表述方式，我理解之间的差异是，一个通过下标查找<code>value</code>，通过寻址方式，时间复杂度是O(1)；另一种是在数组中查找<code>value</code>，排好序的数据，通过二分查找，时间复杂度为O(logn)。(直观理解为字典里根据<code>key</code>查找<code>value</code>和遍历字典查找<code>value</code>的区别，这种理解方式可能不太恰当)</p>
-<h2 id="低效的“插入”和“删除”"><a href="#低效的“插入”和“删除”" class="headerlink" title="低效的“插入”和“删除”"></a>低效的“插入”和“删除”</h2><h3 id="插入操作"><a href="#插入操作" class="headerlink" title="插入操作"></a>插入操作</h3><p>平均时间复杂度O(n)。计算方式：<code>(1+2+....+n)/n=O(n)</code></p>
-<p>改进：将要插入指定位置的原元素放到最后，然后将新元素插入指定位置。时间复杂度O(1)</p>
-<h3 id="删除操作"><a href="#删除操作" class="headerlink" title="删除操作"></a>删除操作</h3><p>平均时间复杂度O(n)</p>
-<p>改进：先记录下已经删除的数据，当数组没有更多空间存储数据时，再触发执行一次真正的删除操作(JVM标记清除垃圾回收算法的核心思想)。时间复杂度视情况而定</p>
-<h2 id="警惕数组的访问越界问题"><a href="#警惕数组的访问越界问题" class="headerlink" title="警惕数组的访问越界问题"></a>警惕数组的访问越界问题</h2><p>在C语言中，只要不是访问受限的内存，所有的内存空间都是可以自由访问的。</p>
-<p>数组越界在C语言中是一种未决行为，并没有规定数组访问越界时编译器应该如何处理。因为访问数组的本质就是访问一段连续内存，只要数组通过偏移计算得到的内存地址是可用的，那么程序就可能不会报任何错误。</p>
-<p>很多计算机病毒也正是利用到了代码中的数组越界可以访问非法地址的漏洞，来攻击系统，所以写代码的时候一定要警惕数组越界。但并非所有的语言都像C语言一样，把数组越界检测的工作丢给程序员来做，像Java本身就会做越界检查，会抛出越界异常。</p>
-<p>文中的代码我在Mac终端通过<code>gcc</code>编译后执行，打印了四次<code>hello world</code>后异常退出，如图，</p>
-<p><img src="index_out_of_bound.jpeg"></p>
-<p>这个问题在文章后的评论里找到了答案：<code>gcc</code>有一个编译选项(<code>-fno-stack-protectot</code>)用于关闭堆栈保护功能。默认情况下启动了堆栈保护，不管<code>i</code>声明在前还是在后，<code>i</code>都会在数组之后压栈，只会循环四次；如果关闭堆栈保护功能，则会出现死循环。C语言代码如下：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>* argv[])</span></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">int</span> arr[<span class="number">3</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">	<span class="keyword">for</span>(; i&lt;=<span class="number">3</span>; i++)&#123;</span><br><span class="line">		arr[i] = <span class="number">0</span>;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;hello world\n&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="容器能否完全替代数组"><a href="#容器能否完全替代数组" class="headerlink" title="容器能否完全替代数组"></a>容器能否完全替代数组</h2><p>针对数组类型，很多语言都提供了容器类，比如<code>Java</code>中的<code>ArrayList</code>、<code>C++ STL</code>中的<code>vector</code>。我的理解，平时<code>Python</code>中经常使用的<code>list</code>、<code>dict</code>、<code>set</code>等提供操作<code>api</code>的类都称之为容器类。</p>
-<p><code>ArrayList</code>最大的优势就是<strong>可以将很多数组操作的细节封装起来</strong>。比如数组插入、删除数据时需要搬移其他数据等。另外，还有一个优势，就是支持<strong>支持动态扩容</strong>。</p>
-<p>需要注意的是，扩容操作涉及内存申请和数据搬移，是比较耗时的，所以，如果事先能确定需要存储的数据大小，最好在<strong>创建<code>ArrayList</code>的时候事先指定数据大小</strong></p>
-<p>总结：</p>
-<ol>
-<li><code>Java ArrayList</code>无法存储基本数据类型，比如<code>int</code>、<code>long</code>，需要封装为<code>Integer</code>、<code>Long</code>类，而<code>Autoboxing(自动装箱)</code>、<code>Unboxing(自动拆箱)</code>则有一定的性能消耗，所以如果特别关注性能，或希望使用基本数据类型，就可以选用数组。</li>
-<li>如果数据大小事先已知，并且对数据的操作非常简单，用不到<code>ArrayList</code>提供的大部分方法，也可以直接使用数组。</li>
-<li>当表示多维数组时，用数组往往会更加直观。比如，<code>Object[][] array</code>；而用容器的话，<code>ArrayList&lt;ArrayList&lt;object&gt;&gt; array</code></li>
-</ol>
-<p>对于业务开发，直接使用容器就足够了，省时省力。毕竟损耗一丢丢性能，完全不会影响到系统整体的性能，但是如果做一些特别底层的开发，比如开发网络框架，性能的优化需要做到极致，这个时候数组就会优于容器。</p>
-<h2 id="解答开篇"><a href="#解答开篇" class="headerlink" title="解答开篇"></a>解答开篇</h2><p>为什么大多数编程语言中，数组要从0开始编号，而不是从1开始呢？</p>
-<ol>
-<li>通过寻址公式来看，从0开始编号，<code>a[k]_address = base_address + k * data_type_size</code>；从1开始编号，<code>a[k]_address = base_address + (k-1) * data_type_size</code>。不难发现，从1开始编号，每次随机访问数组元素都多了一次减法元素，对于CPU来说，就是多了一次减法指令。数组作为非常基础的数据结构，通过下标随机访问数组元素又是其非常基础的编程操作，效率的优化就要尽可能做到极致。</li>
-<li>历史原因。C语言设计者用0开始计数数组下标，之后的Java、JavaScript等高级语言都效仿了C语言，或者说，为了在一定程度上减少C语言程序员学习Java的学习成本，因此继续沿用了从0开始计数的习惯。</li>
-</ol>
-<h2 id="课后思考"><a href="#课后思考" class="headerlink" title="课后思考"></a>课后思考</h2><ol>
-<li><p>JVM的标记清除垃圾回收算法的核心理念</p>
-<p>大多数主流虚拟机采用可达性分析算法来判断对象是否存活，在标记阶段，会遍历所有的<code>GC ROOTS</code>，将所有的<code>GC ROOTS</code>可达的对象标记为存活。只有当标记工作完成后，清理工作才会开始。</p>
-<p>不足：1. 效率问题，标记和清理效率都不高，但是当知道只有少数垃圾产生时会很高效。2.空间问题，会产生不连续的内存空间碎片。</p>
-<p>联想：Python中的垃圾回收机制：主要通过引用计数法进行垃圾回收，通过“标记-清除”解决容器对象可能产生的循环引用问题；通过“分代回收”以空间换时间的方法提高垃圾回收率</p>
-</li>
-<li><p>二维数组的内存寻址公式</p>
-<p>对于<code>m*n</code>的数组，<code>a[i][j] (i&lt;m, j&lt;n)</code>的地址为：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">address = base_address + (i*n + j) * data_type_size</span><br></pre></td></tr></table></figure></li>
-</ol>
-<p>参考链接：</p>
-<ol>
-<li><p><a href="https://zhuanlan.zhihu.com/p/83251959">Python垃圾回收机制！非常实用</a></p>
-</li>
-<li><p><a href="https://blog.csdn.net/qq_42019874/article/details/111599687">二维数组和多维数组的本质及寻址方式</a></p>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>数据结构与算法</category>
-      </categories>
-      <tags>
-        <tag>极客时间</tag>
-        <tag>数组</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>链表(下)</title>
-    <url>/2021/09/17/%E9%93%BE%E8%A1%A8-%E4%B8%8B/</url>
-    <content><![CDATA[<p>链表这块知识理解起来简单，代码实现起来，容易出错，谁写谁知道，所以就有了链表(下)。</p>
-<span id="more"></span>
-
-<h2 id="写链表代码的技巧"><a href="#写链表代码的技巧" class="headerlink" title="写链表代码的技巧"></a>写链表代码的技巧</h2><h3 id="理解指针或引用的含义"><a href="#理解指针或引用的含义" class="headerlink" title="理解指针或引用的含义"></a>理解指针或引用的含义</h3><p><strong>将某个变量赋值给指针，实际上就是将这个变量的地址赋值给指针，或者反过来说，指针里存储了这个变量的内存地址，指向了这个变量，通过指针就能找到这个变量。</strong></p>
-<p>指针，英文定义，<code>A pointer is a variable whose value is the address of another variable.</code></p>
-<h3 id="警惕指针丢失和内存泄漏"><a href="#警惕指针丢失和内存泄漏" class="headerlink" title="警惕指针丢失和内存泄漏"></a>警惕指针丢失和内存泄漏</h3><p>比如，在<code>a</code>、<code>b</code>两个结点之间插入一个结点<code>c</code>，一定是先执行<code>c-&gt;next=a-&gt;next</code>，先把结点<code>c</code>指向结点<code>b</code>，然后再将结点<code>a</code>指向结点<code>c</code>，即<code>a-&gt;next=c</code>。如果顺序颠倒了，就会造成结点<code>b</code>的丢失，链表分成了两半，进而造成内存泄漏。因此，<strong>在插入结点时，一定要注意操作的顺序</strong>。</p>
-<p><strong>删除链表结点时，也一定要记得手动释放内存空间</strong>，否则也会出现内存泄漏的情况。当然，对于像<code>Java</code>这种虚拟机自动管理内存的编程语言来说，就不需要考虑那么多了。</p>
-<h3 id="利用哨兵简化实现难度"><a href="#利用哨兵简化实现难度" class="headerlink" title="利用哨兵简化实现难度"></a>利用哨兵简化实现难度</h3><p>非哨兵模式下链表的插入，比如在<code>p</code>结点后插入一个新结点</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 正常情况</span></span><br><span class="line">new_node.<span class="built_in">next</span> = p.<span class="built_in">next</span></span><br><span class="line">p.<span class="built_in">next</span> = new_node</span><br><span class="line"><span class="comment"># 边界情况，比如向空链表中插入第一个结点</span></span><br><span class="line"><span class="keyword">if</span> (head == <span class="literal">None</span>)&#123;head = new_node&#125;</span><br></pre></td></tr></table></figure>
-
-<p>非哨兵模式下链表的删除，比如删除结点<code>p</code>的后继结点</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 正常情况</span></span><br><span class="line">p.<span class="built_in">next</span> = p.<span class="built_in">next</span>.<span class="built_in">next</span></span><br><span class="line"><span class="comment"># 边界情况，比如删除最后一个结点</span></span><br><span class="line">p.<span class="built_in">next</span> = <span class="literal">None</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>针对链表的插入、删除操作，需要对插入第一个结点和删除最后一个结点的情况进行特殊处理。</strong></p>
-<p>为了解决边界问题，引入哨兵结点。</p>
-<p>哨兵结点，结点本身不存储数据，指定链表头结点，称为新的头结点，如图所示，</p>
-<p><img src="sentinel.webp"></p>
-<p>带有哨兵结点的链表叫<strong>带头链表</strong>；没有哨兵结点的链表叫做<strong>不带头链表</strong>。</p>
-<p>因为哨兵结点一直存在，所以插入第一个节点和插入其他结点，删除最后一个结点和删除其他结点，都可以统一为相同的代码实现逻辑。</p>
-<p>不信的话，自己画画图，理解一下代码，发现确实是真的耶</p>
-<h3 id="重点留意边界条件处理"><a href="#重点留意边界条件处理" class="headerlink" title="重点留意边界条件处理"></a>重点留意边界条件处理</h3><p>检查链表代码是否正确的边界条件有这样几个：</p>
-<ul>
-<li>如果链表为空时，代码是否能正常工作</li>
-<li>如果链表只包含一个结点时，代码是否能正常工作</li>
-<li>如果链表只包含两个结点时，代码是否能正常工作</li>
-<li>代码逻辑在处理头结点和尾结点的时候，是否能正常工作</li>
-</ul>
-<h3 id="举例画图，辅助思考"><a href="#举例画图，辅助思考" class="headerlink" title="举例画图，辅助思考"></a>举例画图，辅助思考</h3><p>举例法和画图法</p>
-<h3 id="多写多练，没有捷径"><a href="#多写多练，没有捷径" class="headerlink" title="多写多练，没有捷径"></a>多写多练，没有捷径</h3><p>5个常见的链表操作</p>
-<ul>
-<li>单链表反转</li>
-<li>链表中环的检测</li>
-<li>两个有序的链表合并</li>
-<li>删除链表倒数第n个结点</li>
-<li>求链表的中间结点</li>
-</ul>
-<p>其实除了两个有序的链表合并，其余的在链表上(上)都写过了，总结起来就是1.快慢指针2.反转相邻的结点。上节课后思考判断回文串这一道题目就把这两个知识点都考查到了，简直是妙啊！</p>
-<h2 id="课后思考"><a href="#课后思考" class="headerlink" title="课后思考"></a>课后思考</h2><p>哨兵模式在其他场景上的应用。</p>
-<p>暂时没想到，后续用到了再来补充吧=.=</p>
-<h2 id="合并两个有序链表"><a href="#合并两个有序链表" class="headerlink" title="合并两个有序链表"></a>合并两个有序链表</h2><h3 id="遍历实现"><a href="#遍历实现" class="headerlink" title="遍历实现"></a>遍历实现</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_sorted_list</span>(<span class="params">l1: Node, l2: Node</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        合并两个有序链表</span></span><br><span class="line"><span class="string">        时间复杂度O(m)+O(n)</span></span><br><span class="line"><span class="string">    :param l1: 链表1头结点</span></span><br><span class="line"><span class="string">    :param l2: 链表2头结点</span></span><br><span class="line"><span class="string">    :return: 合并后链表的头结点</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    node = Node(data=-<span class="number">1</span>)</span><br><span class="line">    <span class="comment"># 需要一个变量保存头结点</span></span><br><span class="line">    head = node</span><br><span class="line">    <span class="keyword">while</span> l1 <span class="keyword">and</span> l2:</span><br><span class="line">        <span class="keyword">if</span> l1.data &lt;= l2.data:</span><br><span class="line">            node.<span class="built_in">next</span> = l1</span><br><span class="line">            <span class="comment"># 后移链表1结点</span></span><br><span class="line">            l1 = l1.<span class="built_in">next</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            node.<span class="built_in">next</span> = l2</span><br><span class="line">            <span class="comment"># 后移链表2结点</span></span><br><span class="line">            l2 = l2.<span class="built_in">next</span></span><br><span class="line">        node = node.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 合并 未合并完的链表</span></span><br><span class="line">    node.<span class="built_in">next</span> = l1 <span class="keyword">if</span> l1 <span class="keyword">else</span> l2</span><br><span class="line">    <span class="keyword">return</span> head.<span class="built_in">next</span></span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    s = SingleLinkedList()</span><br><span class="line"></span><br><span class="line">    s.insert_to_head(<span class="number">5</span>)</span><br><span class="line">    s.insert_to_head(<span class="number">3</span>)</span><br><span class="line">    s.insert_to_head(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    p = SingleLinkedList()</span><br><span class="line">    p.insert_to_head(<span class="number">6</span>)</span><br><span class="line">    p.insert_to_head(<span class="number">5</span>)</span><br><span class="line">    p.insert_to_head(<span class="number">4</span>)</span><br><span class="line">    p.insert_to_head(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">    q = merge_sorted_list(s.get_head_node(), p.get_head_node())</span><br></pre></td></tr></table></figure>
-
-<h3 id="递归实现"><a href="#递归实现" class="headerlink" title="递归实现"></a>递归实现</h3><p>代码先放到这，等学完递归在回过头来看。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_sorted_list2</span>(<span class="params">l1: Node, l2: Node</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        合并两个有序链表</span></span><br><span class="line"><span class="string">        主要思路：</span></span><br><span class="line"><span class="string">        	list1[0] + merge(list1[1], list2[0]) 当list1[0]&lt;list2[0]</span></span><br><span class="line"><span class="string">          list2[0] + merge(list1[0], list2[1]) otherwise</span></span><br><span class="line"><span class="string">    :param l1: 链表1头结点</span></span><br><span class="line"><span class="string">    :param l2: 链表2头结点</span></span><br><span class="line"><span class="string">    :return: 合并后链表的头结点</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> l1:</span><br><span class="line">        <span class="keyword">return</span> l2</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> l2:</span><br><span class="line">        <span class="keyword">return</span> l1</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> l1.data &lt;= l2.data:</span><br><span class="line">        l1.<span class="built_in">next</span> = merge_sorted_list(l1.<span class="built_in">next</span>, l2)</span><br><span class="line">        <span class="keyword">return</span> l1</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        l2.<span class="built_in">next</span> = merge_sorted_list(l1, l2.<span class="built_in">next</span>)</span><br><span class="line">        <span class="keyword">return</span> l2</span><br></pre></td></tr></table></figure>
-
-<h2 id="LRU缓存算法"><a href="#LRU缓存算法" class="headerlink" title="LRU缓存算法"></a>LRU缓存算法</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, x, y</span>):</span></span><br><span class="line">        self.key = x</span><br><span class="line">        self.value = y</span><br><span class="line">        self.<span class="built_in">next</span> = <span class="literal">None</span></span><br><span class="line">        self.prev = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LRUCache</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, capacity: <span class="built_in">int</span></span>):</span></span><br><span class="line">        self.cap = capacity</span><br><span class="line">        <span class="comment"># 存储key和node</span></span><br><span class="line">        self.hkeys = &#123;&#125;</span><br><span class="line">        <span class="comment"># 哨兵结点 避免考虑边界问题</span></span><br><span class="line">        self.top = Node(<span class="literal">None</span>, -<span class="number">1</span>)</span><br><span class="line">        self.tail = Node(<span class="literal">None</span>, -<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        self.top.<span class="built_in">next</span> = self.tail</span><br><span class="line">        self.tail.prev = self.top</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span>(<span class="params">self, key: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.hkeys.keys():</span><br><span class="line">            <span class="comment"># 1.获取结点</span></span><br><span class="line">            cur = self.hkeys[key]</span><br><span class="line">            <span class="comment"># 2.从当前位置拿出</span></span><br><span class="line">            cur.prev.<span class="built_in">next</span> = cur.<span class="built_in">next</span></span><br><span class="line">            cur.<span class="built_in">next</span>.prev = cur.prev</span><br><span class="line">            <span class="comment"># 3.放到链表头部</span></span><br><span class="line">            <span class="comment"># 3.1 保存top后面的结点</span></span><br><span class="line">            tmp = self.top.<span class="built_in">next</span></span><br><span class="line">            <span class="comment"># 3.2 top和cur绑定</span></span><br><span class="line">            self.top.<span class="built_in">next</span> = cur</span><br><span class="line">            cur.prev = self.top</span><br><span class="line">            <span class="comment"># 3.3 cur和tmp绑定</span></span><br><span class="line">            cur.<span class="built_in">next</span> = tmp</span><br><span class="line">            tmp.prev = cur</span><br><span class="line">            <span class="keyword">return</span> self.hkeys[key].value</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span>(<span class="params">self, key: <span class="built_in">int</span>, value: <span class="built_in">int</span></span>) -&gt; <span class="literal">None</span>:</span></span><br><span class="line">        <span class="keyword">if</span> key <span class="keyword">in</span> self.hkeys.keys():</span><br><span class="line">            <span class="comment"># 1.获取结点</span></span><br><span class="line">            cur = self.hkeys[key]</span><br><span class="line">            <span class="comment"># 修改value值</span></span><br><span class="line">            cur.value = value</span><br><span class="line">            <span class="comment"># 2.跳出原位置</span></span><br><span class="line">            cur.prev.<span class="built_in">next</span> = cur.<span class="built_in">next</span></span><br><span class="line">            cur.<span class="built_in">next</span>.prev = cur.prev</span><br><span class="line">            <span class="comment"># 3.将cur放到头结点</span></span><br><span class="line">            top_node = self.top.<span class="built_in">next</span></span><br><span class="line">            self.top.<span class="built_in">next</span> = cur</span><br><span class="line">            cur.prev = self.top</span><br><span class="line">            cur.<span class="built_in">next</span> = top_node</span><br><span class="line">            top_node.prev = cur</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(self.hkeys.keys()) &gt; self.cap:</span><br><span class="line">                <span class="comment"># 从哈希表删除key</span></span><br><span class="line">                self.hkeys.pop(self.tail.prev.key)</span><br><span class="line">                <span class="comment"># 去掉了后继指针</span></span><br><span class="line">                self.tail.prev.prev.<span class="built_in">next</span> = self.tail</span><br><span class="line">                <span class="comment"># 修改尾结点前驱指针，self.tail.prev.prev有点懵的</span></span><br><span class="line">                self.tail.prev = self.tail.prev.prev</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 新增结点</span></span><br><span class="line">            cur = Node(key, value)</span><br><span class="line">            self.hkeys[key] = cur</span><br><span class="line">            <span class="comment"># 最近用过的放到链表头部</span></span><br><span class="line">            <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">                我第一次写的</span></span><br><span class="line"><span class="string">                cur.next = self.top.next</span></span><br><span class="line"><span class="string">                self.top.prev = cur</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">                self.top.next = cur</span></span><br><span class="line"><span class="string">                cur.prev = self.top</span></span><br><span class="line"><span class="string">            &quot;&quot;&quot;</span></span><br><span class="line">            <span class="comment"># 利用tmp保留top下一个结点</span></span><br><span class="line">            tmp = self.top.<span class="built_in">next</span>  </span><br><span class="line">            cur.<span class="built_in">next</span> = tmp</span><br><span class="line">            tmp.prev = cur</span><br><span class="line"></span><br><span class="line">            self.top.<span class="built_in">next</span> = cur</span><br><span class="line">            cur.prev = self.top</span><br></pre></td></tr></table></figure>
-
-<h3 id="感受"><a href="#感受" class="headerlink" title="感受"></a>感受</h3><ol>
-<li><p>写起来好像也没想象中那么难，可能是因为用到哨兵结点，不需要考虑边界问题。</p>
-</li>
-<li><p>主要操作包括：结点从当前位置取出、头部插入结点。</p>
-</li>
-<li><p>操作之间不需要考虑先后顺序，比如结点跳出原位置，</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 结点跳出原位置</span></span><br><span class="line">cur.<span class="built_in">next</span>.prev = cur.prev</span><br><span class="line">cur.prev.<span class="built_in">next</span> = cur.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 链表头部插入结点</span></span><br><span class="line">tmp = self.top.<span class="built_in">next</span></span><br><span class="line">cur.<span class="built_in">next</span> = tmp</span><br><span class="line">tmp.prev = cur</span><br><span class="line"></span><br><span class="line">self.top.<span class="built_in">next</span> = cur</span><br><span class="line">cur.prev = self.top</span><br></pre></td></tr></table></figure>
-
-<p>于是，为了验证这个观点，写一个简单的双向链表<code>demo</code>验证一下，无论怎么更换<code>insert_node_from_head()</code>方法中后四行代码的顺序，结果都是一样的。如果有不对的地方，欢迎指教哈=。=</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        self.value = value</span><br><span class="line">        self.<span class="built_in">next</span> = <span class="literal">None</span></span><br><span class="line">        self.prev = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TwoWayLoop</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.top = Node(value=-<span class="number">1</span>)</span><br><span class="line">        self.tail = Node(value=-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        self.top.<span class="built_in">next</span> = self.tail</span><br><span class="line">        self.tail.prev = self.top</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">insert_node_from_head</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        node = Node(value=value)</span><br><span class="line"></span><br><span class="line">        tmp = self.top.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line">        tmp.prev = node</span><br><span class="line">        node.prev = self.top</span><br><span class="line">        self.top.<span class="built_in">next</span> = node</span><br><span class="line">        node.<span class="built_in">next</span> = tmp</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">delete_node</span>(<span class="params">self, value</span>):</span></span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">            暂时没想好怎么写</span></span><br><span class="line"><span class="string">        :return: </span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        node = self.top.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> node.<span class="built_in">next</span>:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">print_all</span>(<span class="params">self</span>):</span></span><br><span class="line">        node = self.top.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> node.<span class="built_in">next</span>:</span><br><span class="line">            <span class="built_in">print</span>(node.value)</span><br><span class="line">            node = node.<span class="built_in">next</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    t = TwoWayLoop()</span><br><span class="line"></span><br><span class="line">    t.insert_node_from_head(<span class="number">4</span>)</span><br><span class="line">    t.insert_node_from_head(<span class="number">3</span>)</span><br><span class="line">    t.insert_node_from_head(<span class="number">2</span>)</span><br><span class="line">    t.insert_node_from_head(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    t.print_all()  <span class="comment"># 1-&gt;2-&gt;3-&gt;4</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="附：获取类对象的私有属性"><a href="#附：获取类对象的私有属性" class="headerlink" title="附：获取类对象的私有属性"></a>附：获取类对象的私有属性</h2><p>在合并两个有序链表中，需要获取链表的头结点。上篇文章代码中，单链表的<code>SingleLinkedList</code>中的头结点初始化时定义为私有属性<code>self.__head=None</code>，如果直接通过实例对象获取<code>__head</code>会抛出<code>AttributeError</code>异常。</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SingleLinkedList</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">    self.__head = <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  s = SingleLinkedList()</span><br><span class="line">  s.insert_to_head(<span class="number">1</span>)</span><br><span class="line">  <span class="built_in">print</span>(s.__head)  <span class="comment"># AttributeError: &#x27;SingleLinkedList&#x27; object has no attribute &#x27;__head&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="正确的打开方式"><a href="#正确的打开方式" class="headerlink" title="正确的打开方式"></a>正确的打开方式</h3><ol>
-<li>通过定义一个方法获取私有属性</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SingleLinkedList</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">    self.__head = <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">get_head_node</span>(<span class="params">self</span>):</span></span><br><span class="line">    <span class="keyword">return</span> self.__head</span><br><span class="line">    </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  s = SingleLinkedList()</span><br><span class="line">  s.insert_to_head(<span class="number">1</span>)</span><br><span class="line">  <span class="built_in">print</span>(s.get_head_node().data)  <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>通过<code>property</code>将方法转化为属性</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SingleLinkedList</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">    self.__head = <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">get_head_node</span>(<span class="params">self</span>):</span></span><br><span class="line">    <span class="keyword">return</span> self.__head</span><br><span class="line"></span><br><span class="line">  head = <span class="built_in">property</span>(get_head_node)</span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  s = SingleLinkedList()</span><br><span class="line">  s.insert_to_head(<span class="number">1</span>)</span><br><span class="line">  <span class="built_in">print</span>(s.head.data)  <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>通过<code>property</code>装饰器</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SingleLinkedList</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">    self.__head = <span class="literal">None</span></span><br><span class="line">   </span><br><span class="line"><span class="meta">  @property</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">head</span>(<span class="params">self</span>):</span></span><br><span class="line">  	<span class="keyword">return</span> self.__head</span><br><span class="line">  </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  s = SingleLinkedList()</span><br><span class="line">  s.insert_to_head(<span class="number">1</span>)</span><br><span class="line">  <span class="built_in">print</span>(s.head.data)  <span class="comment"># 1</span></span><br></pre></td></tr></table></figure>
-
-<p>参考链接：</p>
-<ol>
-<li><a href="https://zhuanlan.zhihu.com/p/53469919">python变量——单下划线和双下划线</a></li>
-<li><a href="https://www.runoob.com/python/python-func-property.html">Python property() 函数</a></li>
-<li><a href="https://blog.csdn.net/z_feng12489/article/details/106105227">合并两个有序链表（python）</a></li>
-</ol>
-]]></content>
-      <categories>
-        <category>数据结构与算法</category>
-      </categories>
-      <tags>
-        <tag>极客时间</tag>
-        <tag>链表</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>队列</title>
-    <url>/2021/09/27/%E9%98%9F%E5%88%97/</url>
+    <url>/2021/09/24/%E9%98%9F%E5%88%97/</url>
     <content><![CDATA[<p>今天来学习队列。</p>
 <span id="more"></span>
 
