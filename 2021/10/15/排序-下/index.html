@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"linlan.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="今天来学习排序(下)。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="排序(下)">
+<meta property="og:url" content="https://linlan.top/2021/10/15/%E6%8E%92%E5%BA%8F-%E4%B8%8B/index.html">
+<meta property="og:site_name" content="Violin&#39;s Blog">
+<meta property="og:description" content="今天来学习排序(下)。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://linlan.top/2021/10/15/%E6%8E%92%E5%BA%8F-%E4%B8%8B/merge_sort.webp">
+<meta property="og:image" content="https://linlan.top/2021/10/15/%E6%8E%92%E5%BA%8F-%E4%B8%8B/quick_sort.webp">
+<meta property="og:image" content="https://linlan.top/2021/10/15/%E6%8E%92%E5%BA%8F-%E4%B8%8B/merge_sort_vs_quick_sort.webp">
+<meta property="og:image" content="https://linlan.top/2021/10/15/%E6%8E%92%E5%BA%8F-%E4%B8%8B/quick_sort_stable.jpg">
+<meta property="article:published_time" content="2021-10-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-14T16:00:00.000Z">
+<meta property="article:author" content="WangRuilin">
+<meta property="article:tag" content="极客时间">
+<meta property="article:tag" content="排序">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://linlan.top/2021/10/15/%E6%8E%92%E5%BA%8F-%E4%B8%8B/merge_sort.webp">
+
+<link rel="canonical" href="https://linlan.top/2021/10/15/%E6%8E%92%E5%BA%8F-%E4%B8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>排序(下) | Violin's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Violin's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://linlan.top/2021/10/15/%E6%8E%92%E5%BA%8F-%E4%B8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="WangRuilin">
+      <meta itemprop="description" content="日常记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Violin's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          排序(下)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-10-15 00:00:00" itemprop="dateCreated datePublished" datetime="2021-10-15T00:00:00+08:00">2021-10-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>15 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>今天来学习排序(下)。</p>
+<span id="more"></span>
+<h2 id="归并排序的原理">归并排序的原理</h2>
+<p>核心思想：如果要排序一个数组，先把数组从中间分成前后两部分，然后对前后两部分分别排序，再将排好序的两部分合并在一起，这样整个数组就都有序了。</p>
+<p>归并排序使用的是<strong>分治思想</strong>。分治，顾名思义，就是分而治之，将一个大问题分解成小的子问题来解决，小的子问题解决了，大问题也就解决了。</p>
+<p>分治思想跟递归思想很像。分治算法一般都是用递归来实现的。<strong>分治是一种解决问题的处理思想，递归是一种编程技巧</strong>。</p>
+<p>自己又陷入思维误区，试图理解整个递归的过程，然后脑子就懵了...</p>
+<p>回顾一下写递归代码的技巧，<strong>分析得出递归公式，然后找到终止条件，最后将递推公式翻译成递归代码</strong>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 递推公式</span></span><br><span class="line">merge_sort(p...r) = merge(merge_sort(p...q), merge_sort(q+<span class="number">1.</span>..r))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 终止条件</span></span><br><span class="line">p &gt;= r 不用再继续分解</span><br></pre></td></tr></table></figure>
+<p><strong>通过递归代码来实现归并排序</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> <span class="type">List</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_sort</span>(<span class="params">a: <span class="type">List</span>[<span class="built_in">int</span>]</span>):</span></span><br><span class="line">    _merge_sort(a, <span class="number">0</span>, <span class="built_in">len</span>(a)-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_merge_sort</span>(<span class="params">a: <span class="type">List</span>[<span class="built_in">int</span>], low: <span class="built_in">int</span>, high: <span class="built_in">int</span></span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> low &lt; high:</span><br><span class="line">        mid = low + (high - low) // <span class="number">2</span></span><br><span class="line">        _merge_sort(a, low, mid)</span><br><span class="line">        _merge_sort(a, mid+<span class="number">1</span>, high)</span><br><span class="line">        _merge(a, low, mid, high)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_merge</span>(<span class="params">a: <span class="type">List</span>[<span class="built_in">int</span>], low: <span class="built_in">int</span>, mid: <span class="built_in">int</span>, high: <span class="built_in">int</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        合并两个有序数组</span></span><br><span class="line"><span class="string">    :return: </span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    i, j = low, mid+<span class="number">1</span></span><br><span class="line">    tmp = []</span><br><span class="line">    <span class="keyword">while</span> i &lt;= mid <span class="keyword">and</span> j &lt;= high:</span><br><span class="line">        <span class="keyword">if</span> a[i] &lt;= a[j]:</span><br><span class="line">            tmp.append(a[i])</span><br><span class="line">            i += <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            tmp.append(a[j])</span><br><span class="line">            j += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    start = i <span class="keyword">if</span> i &lt;= mid <span class="keyword">else</span> j</span><br><span class="line">    end = mid <span class="keyword">if</span> i &lt;= mid <span class="keyword">else</span> high</span><br><span class="line">    tmp.extend(a[start: end + <span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">    a[low: high+<span class="number">1</span>] = tmp</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    t = [<span class="number">2</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">1</span>]</span><br><span class="line">    merge_sort(t)</span><br><span class="line">    <span class="built_in">print</span>(t)  <span class="comment"># [1, 2, 3, 4, 5]</span></span><br></pre></td></tr></table></figure>
+<p>通过递归写出来的代码，总想看看递归的过程是什么样的。用文章中这张图来说明。</p>
+<p><img src="merge_sort.webp" /></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">初始数组：[11, 8, 3, 9, 7, 1, 2, 5] </span><br><span class="line"></span><br><span class="line">第一次：[8, 11, 3, 9, 7, 1, 2, 5] </span><br><span class="line"></span><br><span class="line">第二次：[8, 11, 3, 9, 7, 1, 2, 5]</span><br><span class="line"></span><br><span class="line">第三次：[3, 8, 9, 11, 7, 1, 2, 5]</span><br><span class="line"></span><br><span class="line">第四次：[3, 8, 9, 11, 1, 7, 2, 5]</span><br><span class="line"></span><br><span class="line">第五次：[3, 8, 9, 11, 1, 7, 2, 5]</span><br><span class="line"></span><br><span class="line">第六次：[3, 8, 9, 11, 1, 2, 5, 7]</span><br><span class="line"></span><br><span class="line">最终结果：[1, 2, 3, 5, 7, 8, 9, 11]</span><br></pre></td></tr></table></figure>
+<p>递归真的很难理解呀！</p>
+<h2 id="归并排序的性能分析">归并排序的性能分析</h2>
+<h3 id="稳定性">稳定性</h3>
+<p>归并排序是稳定的排序算法。在<code>_merge()</code>函数合并两个有序子数组的代码中，当<code>a[i] &lt;= a[j]</code>时，<code>tmp.append(a[i])</code>，即不改变值相同元素的先后顺序，所以归并排序是稳定的排序算法。</p>
+<h3 id="时间复杂度">时间复杂度</h3>
+<p>归并排序的时间复杂度是<code>O(nlogn)</code></p>
+<p>归并排序涉及递归，如何分析递归代码的时间复杂度？</p>
+<p>如果定义求解问题<code>a</code>的时间是<code>T(a)</code>，求解问题<code>b</code>、<code>c</code>的时间分别是<code>T(b)</code>、<code>T(c)</code>，那么</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">T(a) = T(b) + T(c) + K</span><br></pre></td></tr></table></figure>
+<p>其中<code>K</code>等于将两个子问题<code>b</code>、<code>c</code>的结果合并成问题<code>a</code>的结果所消耗的时间。</p>
+<p><strong>不仅递归求解的问题可以写成递推公式，递归代码的时间复杂度也可以写成递推公式。</strong></p>
+<p>假设对<code>n</code>个元素进行归并排序需要的时间是<code>T(n)</code>，那么分解成两个子数组排序的时间都是<code>T(n/2)</code>，<code>_merge()</code>函数合并两个有序子数组的时间复杂度是<code>O(n)</code>(因为两个有序子数组一共有<code>n</code>个元素)。</p>
+<p>所以，套用上面的公式，归并排序的时间复杂度的计算公式就是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">T(1) = C; n=1时，只需要常量级的执行时间，所以表示为C</span><br><span class="line">T(n) = 2*T(n/2) + n; n&gt;1</span><br></pre></td></tr></table></figure>
+<p>进一步分解</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">T(n) = 2*T(n/2) + n</span><br><span class="line"> = 2*(2*T(n/4) + n/2) + n = 4*T(n/4) + 2*n  (将n=n/2整体代入)</span><br><span class="line"> = 4*(2*T(n/8) + n/4) + 2*n = 8*T(n/8) + 3*n</span><br><span class="line"> ...</span><br><span class="line"> = 2^k * T(n/2^k) + k*n</span><br></pre></td></tr></table></figure>
+<p>最终得到<code>T(n) = 2^k * T(n/2^k) + k*n</code>，<code>n</code>代表待排序数组的长度，<code>k</code>代表分解次数，当<code>T(n/2^k)=T(1)</code>时，代表分解数组中个数为1，递归到了尽头，也就是<code>n/2^k=1</code>，此时 <span class="math display">\[
+k=\log_2n
+\]</span> 将<code>k</code>值代入上面的公式，得到 <span class="math display">\[
+T(n) = Cn + n\log_2n
+\]</span> 用大O标记法来表示的话，<code>T(n)=O(nlogn)</code>，所以归并排序的时间复杂度为<code>O(nlogn)</code></p>
+<p>归并排序的执行效率与要排序的原始数组的有序程度无关，其时间复杂度是非常稳定的，不管是最好情况、最坏情况、还是平均情况，时间复杂度都是<code>O(nlogn)</code></p>
+<h3 id="空间复杂度">空间复杂度</h3>
+<p>归并排序的空间复杂度是<code>O(n)</code>。归并排序的时间复杂度任何情况下都是<code>O(nlogn)</code>，看起来非常优秀，但归并排序不是原地排序算法。</p>
+<p>因为归并排序的合并函数，在合并两个有序数组为一个有序数组时，需要借助额外的存储空间。如果继续按照分析递归时间复杂度的方法，通过递推公式来求解，那整个归并过程需要的空间复杂度就是<code>O(nlogn)</code>。</p>
+<p>实际上，递归代码的空间复杂度并不能像时间复杂度那样累加。尽管每次合并操作都需要额外申请额外的内存空间，但在合并完成之后，临时开辟的内存空间就被释放掉了。在任意时刻，CPU只会有一个函数在执行，也就只会有一个临时的内存空间在使用。临时内存空间最大也不会超过<code>n</code>个数据的大小(只考虑最大临时内存空间就好了)，所以空间复杂度是<code>O(n)</code>。</p>
+<h2 id="快速排序的原理">快速排序的原理</h2>
+<p>快速排序，简称快排，利用的也是分治思想。</p>
+<p>核心思想：</p>
+<ol type="1">
+<li><p>如果要排序数组中下标从<code>p</code>到<code>r</code>之间的一组数据，我们选择<code>p</code>到<code>r</code>之间的任意一个数据作为<code>pivot</code>(分区点)。</p></li>
+<li><p>遍历<code>p</code>到<code>r</code>之间的数据，将小于<code>pivot</code>的放到左边，将大于<code>pivot</code>的放到右边，将<code>pivot</code>放到中间。经过这一步骤之后，数组<code>p</code>到<code>r</code>之间的数据就被分成了三个部分，前面<code>p</code>到<code>q-1</code>之间都是小于<code>pivot</code>的，中间是<code>pivot</code>，后面的<code>q+1</code>到<code>r</code>之间是大于<code>pivot</code>的。如图所示，</p>
+<p><img src="quick_sort.webp" /></p></li>
+<li><p>根据分治、递归的处理思想，可以用递归排序下标从<code>p</code>到<code>q-1</code>之间的数据和下标从<code>q+1</code>到<code>r</code>之间的数据，直到区间缩小为1，就说明所有的数据都有序了。</p></li>
+</ol>
+<p>递推公式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 递推公式</span></span><br><span class="line">quick_sort(p...r) = quick_sort(p...q-<span class="number">1</span>) + quick_sort(q...r)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 终止条件</span></span><br><span class="line">p &gt;= r</span><br></pre></td></tr></table></figure>
+<p><strong>通过递归代码来实现快速排序</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> <span class="type">List</span></span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">quick_sort</span>(<span class="params">a: <span class="type">List</span>[<span class="built_in">int</span>]</span>):</span></span><br><span class="line">    _quick_sort(a, <span class="number">0</span>, <span class="built_in">len</span>(a)-<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_quick_sort</span>(<span class="params">a: <span class="type">List</span>[<span class="built_in">int</span>], low: <span class="built_in">int</span>, high: <span class="built_in">int</span></span>):</span></span><br><span class="line">    <span class="keyword">if</span> low &lt; high:</span><br><span class="line">        k = random.randint(low, high)</span><br><span class="line">        <span class="comment"># 把pivot放到首部</span></span><br><span class="line">        a[low], a[k] = a[k], a[low]</span><br><span class="line"></span><br><span class="line">        m = _partition(a, low, high)</span><br><span class="line">        _quick_sort(a, low, m-<span class="number">1</span>)</span><br><span class="line">        _quick_sort(a, m+<span class="number">1</span>, high)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_partition</span>(<span class="params">a: <span class="type">List</span>[<span class="built_in">int</span>], low: <span class="built_in">int</span>, high: <span class="built_in">int</span></span>):</span></span><br><span class="line">    pivot, j = a[low], low</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(low+<span class="number">1</span>, high+<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">if</span> a[i] &lt;= pivot:</span><br><span class="line">            j += <span class="number">1</span>  <span class="comment"># 这里j是记录pivot要放的位置</span></span><br><span class="line">            a[i], a[j] = a[j], a[i]</span><br><span class="line"></span><br><span class="line">    a[low], a[j] = a[j], a[low]</span><br><span class="line">    <span class="keyword">return</span> j</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    t = [<span class="number">3</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>]</span><br><span class="line">    quick_sort(t)</span><br><span class="line">    <span class="built_in">print</span>(t)</span><br></pre></td></tr></table></figure>
+<p>快速排序中有个<code>partition()</code>分区函数，随机选择一个元素作为<code>pivot</code>然后对<code>a[p..r]</code>分区，函数返回<code>pivot</code>的下标。如果不考虑空间消耗，<code>partition</code>分区函数可以写的非常简单。申请两个临时数组<code>X</code>和<code>Y</code>，将小于<code>pivot</code>的元素都拷贝到临时数组<code>X</code>，将大于<code>pivot</code>的元素都拷贝到临时数组<code>Y</code>，最后再将数组<code>X</code>和<code>Y</code>中的元素顺序拷贝到<code>a[p...r]</code>。</p>
+<p>但是，如果这样实现的话，快速排序就不是原地排序算法了。如果考虑空间复杂度为<code>O(1)</code>的话，需要用到类似<strong>选择排序</strong>的处理方式，通过游标<code>j</code>把<code>a[low:high]</code>分成两部分。<code>a[low:j-1]</code>的元素都是小于<code>pivot</code>的，称作“已处理区间”，<code>a[j+1:high]</code>是“未处理区间”。每次从未处理区间取一个值，和<code>pivot</code>对比，如果小于<code>pivot</code>，就把它放到已处理区间的尾部。但在数组某个位置插入元素，需要搬移操作，非常耗时。因此，选择交换的处理方式。</p>
+<p>实现方式：通过游标<code>i</code>从前往后遍历数组<code>a</code>，如果<code>a[i]</code>的值小于<code>pivot</code>，则<code>j+=1</code>，说明有一个元素小于<code>pivot</code>，直至遍历结束。最后，交换<code>pivot</code>和下标为<code>j</code>的值。这样，下标<code>j</code>左边的值都小于<code>pivot</code>，右边的值都大于<code>pivot</code>，</p>
+<h3 id="归并排序vs快速排序">归并排序vs快速排序</h3>
+<p><img src="merge_sort_vs_quick_sort.webp" /></p>
+<p>归并排序的处理过程是<strong>由下到上</strong>的，先处理子问题，然后再合并。而快排正好相反，它的处理过程是<strong>由上到下</strong>的，先分区，然后再处理子问题。归并排序虽然是稳定的、时间复杂度为<code>O(nlogn)</code>的排序算法，但是非原地排序算法。而快速排序通过原地分区函数，可以实现原地排序，解决了归并排序占用太多内存的问题。</p>
+<h2 id="快速排序的性能分析">快速排序的性能分析</h2>
+<h3 id="稳定性-1">稳定性</h3>
+<p>快速排序是不稳定的排序算法。我这里根据序列<code>6, 8, 7, 6, 3, 5, 9, 4</code>仿照文章中的分析，也画了张图。</p>
+<p><img src="quick_sort_stable.jpg" /></p>
+<p>显而易见，当比较<code>3&lt;4</code>时，需要交换下标<code>i</code>和<code>j</code>的值，这样第一个6就跑到了第二个6的后面，因此，快速排序是不稳定的排序算法。想了半天想不明白，画了画图，豁然开朗。</p>
+<p>评论里说，涉及到交换操作的排序算法都是不稳定的，这里先记录一下，后续验证一下。</p>
+<h3 id="时间复杂度-1">时间复杂度</h3>
+<p>快排也是用递归来实现的，对于上面分析归并排序的公式，对于快排同样适用。如果每次分区操作，都能正好把数组分成大小接近相等的两个小区间，那么快排的时间复杂度递推求解公式跟归并排序是相同的。所以快速排序的时间复杂度是<code>O(nlogn)</code>。</p>
+<p>但是，公式成立的前提是每次分区操作，选择的<code>pivot</code>都很合适，正好能将大区间对等地一分为二。但实际上这种情况是很难实现的。</p>
+<p>举一个比较极端的例子。如果数组中的数据原来已经是有序的了，比如<code>1, 3, 5, 6, 8</code>。如果每次选择最后一个元素作为<code>pivot</code>，那每次分区得到的两个区间都是不均等的。这种情况下，快排的时间复杂度就从<code>O(nlogn)</code>退化成了<code>O(n^2)</code>。</p>
+<p>结论：快速排序在大部分情况下的时间复杂度都可以做到<code>O(nlogn)</code>，只有在极端情况下，才会退化到<code>O(n^2)</code>。</p>
+<h3 id="空间复杂度-1">空间复杂度</h3>
+<p>快速排序是原地排序算法。主要取决于分区函数的实现。</p>
+<h2 id="排序算法对比">排序算法对比</h2>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>时间复杂度</th>
+<th>空间复杂度</th>
+<th>稳定性</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>冒泡排序</td>
+<td><code>O(n^2)</code></td>
+<td><code>O(1)</code></td>
+<td>稳定</td>
+</tr>
+<tr class="even">
+<td>插入排序</td>
+<td><code>O(n^2)</code></td>
+<td><code>O(1)</code></td>
+<td>稳定</td>
+</tr>
+<tr class="odd">
+<td>选择排序</td>
+<td><code>O(n^2)</code></td>
+<td><code>O(1)</code></td>
+<td>不稳定(涉及交换元素)</td>
+</tr>
+<tr class="even">
+<td>归并排序</td>
+<td><code>O(nlogn)</code></td>
+<td><code>O(n)</code></td>
+<td>稳定</td>
+</tr>
+<tr class="odd">
+<td>快速排序</td>
+<td><code>O(nlogn)</code></td>
+<td><code>O(1)</code></td>
+<td>不稳定(涉及交换元素)</td>
+</tr>
+</tbody>
+</table>
+<p>冒泡排序、插入排序、选择排序时间复杂度都为<code>O(n^2)</code>，比较高，适合小规模数据的排序。</p>
+<p>归并排序、快速排序时间复杂度都为<code>O(nlogn)</code>，适合大规模的数据排序。</p>
+<h2 id="解答开篇">解答开篇</h2>
+<p>问题：<code>O(n)</code>时间复杂度内求无序数组中的第<code>K</code>大元素？比如，<code>4, 2, 5, 12, 3</code>这样一组数据，第3大元素就是4</p>
+<p>答案：利用分区的思想。我们选择数组区间<code>A[0...n-1]</code>的最后一个元素<code>A[n-1]</code>作为<code>pivot</code>，对数组<code>A[0...n-1]</code>原地分区，这样数组就分成了三部分，<code>A[0...p-1]</code>、<code>A[p]</code>、<code>A[p+1...n-1]</code>。</p>
+<p>如果<code>p+1=K</code>，那么<code>A[p]</code>就是要求解的元素（如果要查找第3大元素，那么下标为2的元素就是要查找的值）；如果<code>K&gt;p+1</code>，说明第<code>K</code>大元素出现在<code>A[p+1...n-1]</code>区间，然后递归地在<code>A[p+1...n-1]</code>这个区间查找。反之，就在<code>A[0...p-1]</code>区间查找。</p>
+<p>那么为什么时间复杂度是<code>O(n)</code>呢？</p>
+<p>第一次分区查找，需要对大小为<code>n</code>的数组执行分区操作，需要遍历<code>n</code>个元素。第二次分区查找，只需要对大小为<code>n/2</code>的数组执行分区操作，需要遍历<code>n/2</code>个元素，依次类推，分区遍历的元素个数分别为：<code>n/2</code>、<code>n/4</code>、<code>n/8</code>、<code>n/16</code>...直到区间缩小为1。</p>
+<p>把每次分区遍历的元素个数加起来，就是<code>n+n/2+n/4+n/8+n/16+...+1</code>，这是一个等比数列求和。</p>
+<p>等比数列求和公式： <span class="math display">\[
+S_n = \frac{a_1*(1-q^n)}{1-q}=\frac{a_1-a_nq}{1-q}=\frac{a_nq-a_1}{q-1},(q\neq1)
+\]</span> 即： <span class="math display">\[
+S_n = \frac{(1*\frac{1}{2}-n)}{\frac{1}{2}-1}=\frac{1-2n}{1-2}=2n-1
+\]</span> 所以上述思路的时间复杂度就为<code>O(n)</code>。</p>
+<p>文章中提到一个方法，每次取数组中的最大值，将其移动到数组的最前面，然后在剩下的数组中继续找最大值，以此类推，执行<code>K</code>次，找到的数据不就是第<code>K</code>大元素了吗？</p>
+<p>首先，这是选择排序的思路，其次寻找第<code>K</code>大元素的时间复杂度是<code>O(K*n)</code>，并不是<code>O(n)</code>，时间复杂度前面的系数<code>K</code>是比较小的常量时，那么时间复杂度确实是<code>O(n)</code>，但当<code>K</code>等于<code>n/2</code>或是<code>n</code>时，这种最坏情况下的时间复杂度就是<code>O(n^2)</code>。</p>
+<h2 id="课后思考">课后思考</h2>
+<p>现在有10个接口访问日志文件，每个日志文件大小约300MB，每个文件里的日志都是按照时间戳从小到大排序的。希望将这10个较小的日志文件，合并为1个日志文件，合并之后的日志仍然按照时间戳从小到大排列。如果处理上述排序任务的机器内存只有1GB，有什么好的解决思路，能“快速”地将这10个日志文件合并吗？</p>
+<p>来自置顶评论的答案：每次从各个文件中取一条数据，在内存中根据数据时间戳构建一个最小堆，然后每次把最小值给写入新文件，同时将最小值来自的那个文件再出来一个数据，加入到最小堆中。这个空间复杂度为常数，但没能很好利用1G内存，而且磁盘单个读取比较慢，所以考虑每次读取一批数据，没了再从磁盘中取，时间复杂度还是<code>O(n)</code>。</p>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="WangRuilin 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4/" rel="tag"># 极客时间</a>
+              <a href="/tags/%E6%8E%92%E5%BA%8F/" rel="tag"># 排序</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/10/09/adb%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="prev" title="adb常用命令">
+      <i class="fa fa-chevron-left"></i> adb常用命令
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">归并排序的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E7%9A%84%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">归并排序的性能分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A8%B3%E5%AE%9A%E6%80%A7"><span class="nav-number">2.1.</span> <span class="nav-text">稳定性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">2.2.</span> <span class="nav-text">时间复杂度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">2.3.</span> <span class="nav-text">空间复杂度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">快速排序的原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8Fvs%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F"><span class="nav-number">3.1.</span> <span class="nav-text">归并排序vs快速排序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E7%9A%84%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">快速排序的性能分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A8%B3%E5%AE%9A%E6%80%A7-1"><span class="nav-number">4.1.</span> <span class="nav-text">稳定性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6-1"><span class="nav-number">4.2.</span> <span class="nav-text">时间复杂度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6-1"><span class="nav-number">4.3.</span> <span class="nav-text">空间复杂度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="nav-number">5.</span> <span class="nav-text">排序算法对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E7%AD%94%E5%BC%80%E7%AF%87"><span class="nav-number">6.</span> <span class="nav-text">解答开篇</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E5%90%8E%E6%80%9D%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">课后思考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="WangRuilin"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">WangRuilin</p>
+  <div class="site-description" itemprop="description">日常记录</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WangRuilin</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
