@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>adb常用命令</title>
+    <url>/2021/10/09/adb%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<p>在安卓逆向过程中，经常会用到<code>adb</code>命令，本篇将记录一些<code>adb</code>命令，但自己又记不住的。</p>
+<span id="more"></span>
+<ol type="1">
+<li><p>查看顶层的<code>activity</code>，这个命令我经常用来查看<code>App</code>包名</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb shell dumpsys activity top | grep ACTIVITY</span><br></pre></td></tr></table></figure></li>
+<li><p>截图。将图片保存到<code>/sdcard</code>路径下</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb shell screencap -p /sdcard/screen.png</span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <categories>
+        <category>安卓逆向</category>
+      </categories>
+      <tags>
+        <tag>adb命令</tag>
+        <tag>逆向</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>二分查找(上)</title>
     <url>/2021/10/20/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE(%E4%B8%8A)/</url>
     <content><![CDATA[<p>今天学习二分查找。</p>
@@ -26,7 +46,7 @@ n, \frac{n}{2}, \frac{n}{4}, \frac{n}{8},...\frac{n}{2^k}...
 <p>注意是<code>low&lt;=high</code>，而不是<code>low&lt;high</code>。当<code>low=high</code>时，如果此时刚好<code>a[low]=a[high]=target</code>，加上终止条件<code>low&lt;high</code>退出循环，导致查找失败。</p></li>
 <li><p><code>mid</code>的取值</p>
 <p>实际上，<code>mid=(low+high)//2</code>这种写法是有问题的。因为如果<code>low</code>和<code>high</code>比较大的话，两者之和就有可能溢出。改进的方法是将<code>mid</code>的计算方式写成<code>low+(high-low)//2</code>。更进一步，如果要将性能优化到极致的话，可以将除以2操作转化成位运算<code>low+(high-low)&gt;&gt;1</code>。因为相比除法运算来说，计算机处理位运算要快得多。</p>
-<p>为什么右移一位相当于除以2，左移一位相当于乘以2？以十进制数。如136，左移一位后，空出的位置用0填补，左移一位相当于把小数点右移一位，就变成了1360，相当于<code>136*10</code>；同理，136右移一位后，移出的位舍去，就变成了13，相当于136/10。因此，十进制左移一位相当于乘以10，右移一位相当于除以10。对于二进制的移位操作同样适用。</p></li>
+<p>为什么右移一位相当于除以2，左移一位相当于乘以2？以十进制数举例。如136，左移一位后，空出的位置用0填补，左移一位相当于把小数点右移一位，就变成了1360，相当于<code>136*10</code>；同理，136右移一位后，移出的位舍去，就变成了13，相当于136/10。因此，十进制左移一位相当于乘以10，右移一位相当于除以10。对于二进制的移位操作同样适用。</p></li>
 <li><p><code>low</code>和<code>high</code>的更新</p>
 <p><code>low=mid+1</code>，<code>high=mid-1</code>。注意这里的<code>+1</code>和<code>-1</code>，如果直接写成<code>low=mid</code>或者<code>high=mid</code>，就可能会发生死循环。</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binary_search</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span></span><br><span class="line"></span><br><span class="line">    low, high = <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> low &lt;= high:</span><br><span class="line">        mid = low + (high - low) // <span class="number">2</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> nums[mid] == target:</span><br><span class="line">            <span class="keyword">return</span> mid</span><br><span class="line">        <span class="keyword">elif</span> nums[mid] &lt; target:</span><br><span class="line">            low = mid</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            high = mid</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">10</span>]</span><br><span class="line">    <span class="built_in">print</span>(binary_search(nums=a, target=<span class="number">3</span>))  <span class="comment"># 出现死循环</span></span><br></pre></td></tr></table></figure></li>
@@ -49,8 +69,7 @@ n, \frac{n}{2}, \frac{n}{4}, \frac{n}{8},...\frac{n}{2^k}...
 <li><p>如何编程实现“求一个数的平方根”？要求精确到小数点后6位。参考LeetCode答案：<a href="https://leetcode-cn.com/problems/sqrtx/solution/python-kai-gen-hao-bao-liu-xiao-shu-dian-sehr/">Python 开根号 保留小数点后几位</a></p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binary_search_sqrt</span>(<span class="params">x, k</span>):</span></span><br><span class="line">    low, high = <span class="number">0</span>, x</span><br><span class="line">    <span class="keyword">while</span> low &lt;= high:</span><br><span class="line">        mid = low + (high-low) / <span class="number">2</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">abs</span>(mid * mid - x) &lt; <span class="number">0.1</span> ** k:</span><br><span class="line">            <span class="comment"># 在误差范围内 保留指定位数</span></span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">round</span>(mid, k)</span><br><span class="line">        <span class="keyword">elif</span> mid * mid &gt; x:</span><br><span class="line">            high = mid</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            low = mid</span><br><span class="line">            </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    result = binary_search_sqrt(<span class="number">2</span>, <span class="number">6</span>)  <span class="comment"># 1.414214</span></span><br><span class="line">    result = binary_search_sqrt(<span class="number">4</span>, <span class="number">6</span>)  <span class="comment"># 2.0</span></span><br><span class="line">    <span class="built_in">print</span>(result)</span><br></pre></td></tr></table></figure></li>
 <li><p>如果数据使用链表存储，二分查找的时间复杂就会变成很高，那查找的时间复杂度究竟是多少呢？</p>
-<p>来自置顶评论的答案：</p>
-<p>假设链表长度为<code>n</code>，二分查找每次都要找到中间点（计算中忽略奇偶数差异）：</p>
+<p>来自置顶评论的答案：假设链表长度为<code>n</code>，二分查找每次都要找到中间点（计算中忽略奇偶数差异）：</p>
 <p>第一次查找中间点，需要移动指针<code>n/2</code>次，</p>
 <p>第二次查找中间点，需要移动指针<code>n/4</code>次，</p>
 <p>第三次查找中间点，需要移动指针<code>n/8</code>次，</p>
@@ -74,23 +93,66 @@ S_n = \frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{1*\frac{1}{2}-\frac{n}{
       </tags>
   </entry>
   <entry>
-    <title>adb常用命令</title>
-    <url>/2021/10/09/adb%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</url>
-    <content><![CDATA[<p>在安卓逆向过程中，经常会用到<code>adb</code>命令，本篇将记录一些<code>adb</code>命令，但自己又记不住的。</p>
+    <title>二分查找(下)</title>
+    <url>/2021/10/22/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE-%E4%B8%8B/</url>
+    <content><![CDATA[<p>接着学一下二分查找（下）。</p>
 <span id="more"></span>
+<h2 id="典型的二分查找问题">典型的二分查找问题</h2>
+<h3 id="查找第一个值等于给定值的元素">查找第一个值等于给定值的元素</h3>
+<p>有序数据集合中存在重复的数据，如何找到第一个值等于给定值的数据？假设数据是从小到大排列为前提。</p>
+<p>第一种方法，比较容易理解</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binary_search_left</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span></span><br><span class="line">    low, high = <span class="number">0</span>, <span class="built_in">len</span>(nums)-<span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> low &lt;= high:</span><br><span class="line">        mid = low + ((high - low) &gt;&gt; <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> nums[mid] &gt; target:</span><br><span class="line">            high = mid - <span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> nums[mid] &lt; target:</span><br><span class="line">            low = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 如果是首元素或者前一个元素不为target</span></span><br><span class="line">            <span class="keyword">if</span> mid == <span class="number">0</span> <span class="keyword">or</span> nums[mid-<span class="number">1</span>] != target:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                high = mid - <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    a = [<span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">10</span>]</span><br><span class="line">    <span class="built_in">print</span>(binary_search_left(nums=a, target=<span class="number">2</span>))  <span class="comment"># 2</span></span><br></pre></td></tr></table></figure>
+<p>第二种方法，比较简洁，但是不太容易理解。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binary_search_left</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span></span><br><span class="line"></span><br><span class="line">    low, high = <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> low &lt;= high:</span><br><span class="line"></span><br><span class="line">        mid = low + (high - low) // <span class="number">2</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> nums[mid] &gt;= target:</span><br><span class="line">            high = mid - <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            low = mid + <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> low &lt; <span class="built_in">len</span>(nums) <span class="keyword">and</span> nums[low] == target:</span><br><span class="line">        <span class="keyword">return</span> low</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>这段代码中有两个地方比较难理解，第一个是<code>if num[mid] &gt;= target: high = mid-1</code>，文章中有段评论写的比较好，可以帮助理解。当<code>mid</code>等于<code>value</code>时，高位还会往左移去找第一个，那么势必会带来的问题是即使找到了第一个值为<code>value</code>的元素，高位还是会往左移动，但下一次判断的时候数组中已经没有值为<code>value</code>的值了，这时候代码会继续循环一直到低位加一后大于高位，这时候代码会跳出循环，而此时的低位正好是高位上一个经过的值为<code>value</code>的第一个元素。举例，假如有序数据集合为<code>[1, 1, 1, 2, 2, 6, 9, 10]</code>，然后<code>debug</code>来分析，会一目了然。第二个是<code>low &lt; len(nums)</code>，因为返回值是返回符合指定值的<code>low</code>，所以要判断一下数组是否越界。那什么情况下会数组越界呢？末尾文章评论中提到一种特殊情况，如果给定的值大于任何一个数组元素，<code>low</code>就会等于<code>len(nums)</code>，会导致数组越界。</p>
+<h3 id="查找最后一个值等于给定值的元素">查找最后一个值等于给定值的元素</h3>
+<p>有序数据集合中存在重复的数据，如何找到最后一个值等于给定值的数据？假设数据是从小到大排列为前提。</p>
+<p>仿照上一题的第一种解法：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binary_search_right</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span></span><br><span class="line"></span><br><span class="line">    low, high = <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> low &lt;= high:</span><br><span class="line"></span><br><span class="line">        mid = low + ((high - low) &gt;&gt; <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> nums[mid] &gt; target:</span><br><span class="line">            high = mid - <span class="number">1</span></span><br><span class="line">        <span class="keyword">elif</span> nums[mid] &lt; target:</span><br><span class="line">            low = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="comment"># 如果是末尾元素或者下一个元素不为target</span></span><br><span class="line">            <span class="keyword">if</span> mid == <span class="built_in">len</span>(nums) - <span class="number">1</span> <span class="keyword">or</span> nums[mid+<span class="number">1</span>] != target:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            low = mid + <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    a = [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">10</span>]</span><br><span class="line">    <span class="built_in">print</span>(binary_search_right(nums=a, target=<span class="number">2</span>))  <span class="comment"># 4</span></span><br><span class="line">    <span class="built_in">print</span>(binary_search_right(nums=a, target=<span class="number">1</span>))  <span class="comment"># 2</span></span><br></pre></td></tr></table></figure>
+<h3 id="查找第一个大于等于给定值的元素">查找第一个大于等于给定值的元素</h3>
+<p>在有序数组中，查找第一个大于等于给定值的元素。比如，数组中存储的这样的一个序列，<code>3, 4, 6, 7, 10</code>。如果查找第一个大于等于5的元素，那就是6。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binary_search_left_no_less</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span></span><br><span class="line">    low, high = <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> low &lt;= high:</span><br><span class="line"></span><br><span class="line">        mid = low + ((high - low) &gt;&gt; <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> nums[mid] &gt;= target:</span><br><span class="line">            <span class="comment"># 如果是首元素或者前一个元素小于target</span></span><br><span class="line">            <span class="comment"># 注意边界条件mid==0</span></span><br><span class="line">            <span class="keyword">if</span> nums[mid-<span class="number">1</span>] &lt; target <span class="keyword">or</span> mid == <span class="number">0</span>:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            high = mid - <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            low = mid + <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    a = [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">10</span>]</span><br><span class="line">    <span class="built_in">print</span>(binary_search_left_no_less(nums=a, target=<span class="number">1</span>))  <span class="comment"># 0</span></span><br><span class="line">    <span class="built_in">print</span>(binary_search_left_no_less(nums=a, target=<span class="number">2</span>))  <span class="comment"># 3</span></span><br><span class="line">    <span class="built_in">print</span>(binary_search_left_no_less(nums=a, target=<span class="number">5</span>))  <span class="comment"># 5</span></span><br></pre></td></tr></table></figure>
+<h3 id="查找最后一个小于等于给定值的元素">查找最后一个小于等于给定值的元素</h3>
+<p>查找最后一个小于等于给定值的元素。比如，数组中存储了这样一组数据：<code>3, 5, 6, 8, 9, 10</code>。最后一个小于等于7的元素就是6。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binary_search_right_no_less</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span></span><br><span class="line">    low, high = <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> low &lt;= high:</span><br><span class="line">        mid = low + ((high - low) &gt;&gt; <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> nums[mid] &lt;= target:</span><br><span class="line">            <span class="comment"># 如果是末尾元素或者下一个元素大于target</span></span><br><span class="line">            <span class="keyword">if</span> mid == (<span class="built_in">len</span>(nums)-<span class="number">1</span>) <span class="keyword">or</span> nums[mid+<span class="number">1</span>] &gt; target:</span><br><span class="line">                <span class="keyword">return</span> mid</span><br><span class="line">            low = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            high = mid - <span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    a = [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">10</span>]</span><br><span class="line">    <span class="built_in">print</span>(binary_search_right_no_less(nums=a, target=<span class="number">1</span>))  <span class="comment"># 2</span></span><br><span class="line">    <span class="built_in">print</span>(binary_search_right_no_less(nums=a, target=<span class="number">4</span>))  <span class="comment"># 4</span></span><br></pre></td></tr></table></figure>
+<h2 id="解答开篇">解答开篇</h2>
+<p>如何快速定位出一个IP地址的归属地？这里我反复读了好几遍，没有理解文章的含义。</p>
+<p>文章主要是通过这个问题引出第四种变形问题“在有序数组中，查找最后一个小于等于给定值的元素”。</p>
+<h2 id="内容小结">内容小结</h2>
+<p>二分查找更适合用在“近似”查找问题，在这类问题上，二分查找的优势更加明显。</p>
+<p>除了前面涉及到的这四道题目，二分查找的变形问题其实还可以有很多，比如“查找第一个小于等于给定值的元素”，“查找最后一个大于等于给定值的元素”。相比二分查找问题，二分查找变形问题的关键在于，<code>low</code>和<code>high</code>的更新。</p>
+<h2 id="课后思考">课后思考</h2>
+<p>如果有序数组是一个循环有序数组，比如<code>4, 5, 6, 1, 2, 3</code>。针对这种情况，如何实现一个求“值等于给定值”的二分查找算法？</p>
+<h3 id="第一种方法">第一种方法</h3>
 <ol type="1">
-<li><p>查看顶层的<code>activity</code>，这个命令我经常用来查看<code>App</code>包名</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb shell dumpsys activity top | grep ACTIVITY</span><br></pre></td></tr></table></figure></li>
-<li><p>截图。将图片保存到<code>/sdcard</code>路径下</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb shell screencap -p /sdcard/screen.png</span><br></pre></td></tr></table></figure></li>
+<li><p>找到分界下标，分成两个有序数组。</p></li>
+<li><p>判断目标值在哪个有序数据范围内，做二分查找。</p></li>
 </ol>
+<p>时间复杂度<code>O(n)</code></p>
+<h3 id="第二种方法">第二种方法</h3>
+<ol type="1">
+<li><p>找到最大值的下标<code>x</code>；</p></li>
+<li><p>所有元素下标<code>+x</code>偏移，超过数组范围值的取模；</p></li>
+<li><p>利用偏移后的下标做二分查找；</p></li>
+<li><p>如果找到目标下标，再做<code>-x</code>操作，就是目标值实际下标。</p></li>
+</ol>
+<p>时间复杂度<code>O(n)</code></p>
+<h3 id="第三种方法">第三种方法</h3>
+<p>以数组中间点分区，会将数组分成一个有序数组和一个循环有序数组。</p>
+<ul>
+<li><p>如果首元素小于<code>mid</code>，说明前半部分是有序的，后半部分是循环有序数组。</p></li>
+<li><p>如果首元素大于<code>mid</code>，说明前半部分是循环有序数组，后半部分是有序的。</p></li>
+</ul>
+<p>如果目标元素在有序数组范围中，使用二分查找。</p>
+<p>如果目标元素在循环有序数组中，递归以上操作，直到目标元素出现在有序数组范围中。</p>
+<p>这种方式相当于两次二分查找，时间复杂度为<code>O(logn)</code>。</p>
 ]]></content>
       <categories>
-        <category>安卓逆向</category>
+        <category>数据结构与算法</category>
       </categories>
       <tags>
-        <tag>adb命令</tag>
-        <tag>逆向</tag>
+        <tag>极客时间</tag>
+        <tag>二分查找</tag>
       </tags>
   </entry>
   <entry>
