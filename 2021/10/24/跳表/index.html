@@ -273,7 +273,7 @@
 <h2 id="时间复杂度">时间复杂度</h2>
 <p>在一个具有多级索引的跳表中，查询某个数据的时间复杂度是多少？</p>
 <p>如果链表里有<code>n</code>个结点，会有多少级索引？</p>
-<p>第一层索引，<span class="math inline">\(\frac{n}{2}\)</span>个结点，第二层索引，<span class="math inline">\(\frac{n}{4}\)</span>个结点...以此类推，第<code>k</code>层索引，<span class="math inline">\(\frac{n}{2^k}\)</span>个结点，当<span class="math inline">\(\frac{n}{2^k}=2\)</span>时，即<span class="math inline">\(k=log_2n-1\)</span>时，不需要再建立索引。因此，如果链表里有<code>n</code>个结点，会有<span class="math inline">\(log_2n-1\)</span>级索引。加上原始链表这一层，整个跳表的层数为<span class="math inline">\(log_2n\)</span>。</p>
+<p>第一层索引，<span class="math inline">\(\frac{n}{2}\)</span>个结点，第二层索引，<span class="math inline">\(\frac{n}{4}\)</span>个结点...以此类推，第<code>k</code>层索引，<span class="math inline">\(\frac{n}{2^k}\)</span>个结点，当<span class="math inline">\(\frac{n}{2^k}=2\)</span>时，即<span class="math inline">\(k=log_2n-1\)</span>时，不需要再建立索引。加上原始链表这一层，整个跳表的层数为<span class="math inline">\(log_2n\)</span>。</p>
 <p>在跳表中查询某个数据的时候，如果每一层都要遍历<code>m</code>个结点，那么在跳表中查询一个数据的时间复杂度就是<span class="math inline">\(m*logn\)</span>。</p>
 <p>这个<code>m</code>值是多少？按照前面这种索引结构，每一级索引都最多只需要遍历3个结点，也就是<code>m=3</code>。自己理解，前面这种索引结构是每两个结点提取一个结点到上一级，因此<code>m=3</code>。如果索引结构按照每三个结点提取一个结点到上一级，则<code>m=4</code>。也就是说，如果说索引结构按照每<code>n</code>个结点提取一个结点到上一级，则<code>m=n+1</code>。</p>
 <p>所以在跳表中查询任意数据的时间复杂度就是<span class="math inline">\(logn\)</span>。</p>
