@@ -22,7 +22,7 @@
   </entry>
   <entry>
     <title>二分查找(上)</title>
-    <url>/2021/10/20/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE(%E4%B8%8A)/</url>
+    <url>/2021/10/20/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE-%E4%B8%8A/</url>
     <content><![CDATA[<p>今天学习二分查找。</p>
 <span id="more"></span>
 <h2 id="定义">定义</h2>
@@ -33,8 +33,8 @@
 n, \frac{n}{2}, \frac{n}{4}, \frac{n}{8},...\frac{n}{2^k}...
 \]</span> 其中， <span class="math display">\[
 当\frac{n}{2^k}=1时，
-\]</span> <code>k</code>的值就是缩小的次数。而每一次缩小操作只涉及两个数据的大小比较，所以，经过了<code>k</code>次区间缩小操作，时间复杂度就是<code>O(k)</code>。通过<code>n/(2^k)=1</code>，得到<code>k=logn</code>，所以时间复杂度就是<code>O(logn)</code>。</p>
-<p>常量级时间复杂度的算法有时候可能还没有<code>O(logn)</code>的算法执行效率高。比如，<code>O(1)</code>有可能表示的是一个非常大的常量值，比如<code>O(1000)</code>，<code>O(10000)</code>。而<code>logn</code>即使<code>n</code>非常非常大，对应的<code>logn</code>也很小。比如，<code>n</code>等于2的32次方，大约是42亿，也就是说，如果在42亿个数据中用二分查找一个数据，最多需要比较32次。</p>
+\]</span> <code>k</code>的值就是缩小的次数。而每一次缩小操作只涉及两个数据的大小比较，所以，经过了<code>k</code>次区间缩小操作，时间复杂度就是<span class="math inline">\(O(k)\)</span>。通过<span class="math inline">\(\frac{n}{2^k}=1\)</span>，得到<span class="math inline">\(k=log_2n\)</span>，所以时间复杂度就是<span class="math inline">\(O(logn)\)</span>。</p>
+<p>常量级时间复杂度的算法有时候可能还没有<span class="math inline">\(O(logn)\)</span>的算法执行效率高。比如，<span class="math inline">\(O(1)\)</span>有可能表示的是一个非常大的常量值，比如<span class="math inline">\(O(1000)\)</span>，<span class="math inline">\(O(10000)\)</span>。而<code>logn</code>即使<code>n</code>非常非常大，对应的<code>logn</code>也很小。比如，<code>n</code>等于2的32次方，大约是42亿，也就是说，如果在42亿个数据中用二分查找一个数据，最多需要比较32次。</p>
 <h2 id="实现">实现</h2>
 <h3 id="非递归">非递归</h3>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># -*- coding:utf-8 -*-</span></span><br><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> <span class="type">List</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binary_search</span>(<span class="params">nums: <span class="type">List</span>[<span class="built_in">int</span>], target: <span class="built_in">int</span></span>) -&gt; <span class="built_in">int</span>:</span></span><br><span class="line"></span><br><span class="line">    low, high = <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> low &lt;= high:</span><br><span class="line">        <span class="comment"># mid = low + ((high - low) &gt;&gt; 1)</span></span><br><span class="line">        mid = low + (high - low) // <span class="number">2</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> nums[mid] == target:</span><br><span class="line">            <span class="keyword">return</span> mid</span><br><span class="line">        <span class="keyword">elif</span> nums[mid] &lt;= target:</span><br><span class="line">            low = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            high = mid - <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    a = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">10</span>]</span><br><span class="line">    <span class="built_in">print</span>(binary_search(nums=a, target=<span class="number">2</span>))  <span class="comment"># 1</span></span><br><span class="line">    <span class="built_in">print</span>(binary_search(nums=a, target=<span class="number">3</span>))  <span class="comment"># 2</span></span><br><span class="line">    <span class="built_in">print</span>(binary_search(nums=a, target=<span class="number">11</span>))  <span class="comment"># -1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
@@ -77,7 +77,7 @@ n, \frac{n}{2}, \frac{n}{4}, \frac{n}{8},...\frac{n}{2^k}...
 <p>以此类推，直到1次为止。</p>
 <p>总共移动指针次数，根据等比数列求和公式： <span class="math display">\[
 S_n = \frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{1*\frac{1}{2}-\frac{n}{2}}{\frac{1}{2}-1}=n-1
-\]</span> 所以，时间复杂度是<code>O(n)</code>。</p></li>
+\]</span> 所以，时间复杂度是<span class="math inline">\(O(n)\)</span>。</p></li>
 </ol>
 <p>参考链接：</p>
 <ol type="1">
@@ -128,7 +128,7 @@ S_n = \frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{1*\frac{1}{2}-\frac{n}{
 <li><p>找到分界下标，分成两个有序数组。</p></li>
 <li><p>判断目标值在哪个有序数据范围内，做二分查找。</p></li>
 </ol>
-<p>时间复杂度<code>O(n)</code></p>
+<p>时间复杂度<span class="math inline">\(O(n)\)</span></p>
 <h3 id="第二种方法">第二种方法</h3>
 <ol type="1">
 <li><p>找到最大值的下标<code>x</code>；</p></li>
@@ -136,7 +136,7 @@ S_n = \frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{1*\frac{1}{2}-\frac{n}{
 <li><p>利用偏移后的下标做二分查找；</p></li>
 <li><p>如果找到目标下标，再做<code>-x</code>操作，就是目标值实际下标。</p></li>
 </ol>
-<p>时间复杂度<code>O(n)</code></p>
+<p>时间复杂度<span class="math inline">\(O(n)\)</span></p>
 <h3 id="第三种方法">第三种方法</h3>
 <p>以数组中间点分区，会将数组分成一个有序数组和一个循环有序数组。</p>
 <ul>
@@ -145,7 +145,7 @@ S_n = \frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{1*\frac{1}{2}-\frac{n}{
 </ul>
 <p>如果目标元素在有序数组范围中，使用二分查找。</p>
 <p>如果目标元素在循环有序数组中，递归以上操作，直到目标元素出现在有序数组范围中。</p>
-<p>这种方式相当于两次二分查找，时间复杂度为<code>O(logn)</code>。</p>
+<p>这种方式相当于两次二分查找，时间复杂度为<span class="math inline">\(O(logn)\)</span></p>
 ]]></content>
       <categories>
         <category>数据结构与算法</category>
@@ -429,9 +429,8 @@ S_n = \frac{(1*\frac{1}{2}-n)}{\frac{1}{2}-1}=\frac{1-2n}{1-2}=2n-1
   <entry>
     <title>排序优化</title>
     <url>/2021/10/18/%E6%8E%92%E5%BA%8F%E4%BC%98%E5%8C%96/</url>
-    <content><![CDATA[<p>今天来学一下排序优化。</p>
+    <content><![CDATA[<p>今天来学一下排序优化。如何实现一个通用的、高性能的排序函数？</p>
 <span id="more"></span>
-<p>如何实现一个通用的、高性能的排序函数？</p>
 <h2 id="如何选择合适的排序算法">如何选择合适的排序算法</h2>
 <table>
 <thead>
@@ -445,76 +444,76 @@ S_n = \frac{(1*\frac{1}{2}-n)}{\frac{1}{2}-1}=\frac{1-2n}{1-2}=2n-1
 <tbody>
 <tr class="odd">
 <td>冒泡排序</td>
-<td><code>O(n^2)</code></td>
+<td><span class="math inline">\(O(n^2)\)</span></td>
 <td>是</td>
 <td>是</td>
 </tr>
 <tr class="even">
 <td>插入排序</td>
-<td><code>O(n^2)</code></td>
+<td><span class="math inline">\(O(n^2)\)</span></td>
 <td>是</td>
 <td>是</td>
 </tr>
 <tr class="odd">
 <td>选择排序</td>
-<td><code>O(n^2)</code></td>
+<td><span class="math inline">\(O(n^2)\)</span></td>
 <td>否</td>
 <td>是</td>
 </tr>
 <tr class="even">
 <td>快速排序</td>
-<td><code>O(nlogn)</code></td>
+<td><span class="math inline">\(O(nlogn)\)</span></td>
 <td>否</td>
 <td>是</td>
 </tr>
 <tr class="odd">
 <td>归并排序</td>
-<td><code>O(nlogn)</code></td>
+<td><span class="math inline">\(O(nlogn)\)</span></td>
 <td>是</td>
 <td>否</td>
 </tr>
 <tr class="even">
 <td>桶排序</td>
-<td><code>O(n)</code></td>
+<td><span class="math inline">\(O(n)\)</span></td>
 <td>是</td>
 <td>否</td>
 </tr>
 <tr class="odd">
 <td>计数排序</td>
-<td><code>O(n+k)</code> k是数据范围</td>
+<td><span class="math inline">\(O(n+k)\)</span> k是数据范围</td>
 <td>是</td>
 <td>否</td>
 </tr>
 <tr class="even">
 <td>基数排序</td>
-<td><code>O(dn)</code> d是维度</td>
+<td><span class="math inline">\(O(dn)\)</span> d是维度</td>
 <td>是</td>
 <td>否</td>
 </tr>
 </tbody>
 </table>
-<p>这里计数排序和基数排序的时间复杂度为什么是<code>O(n+k)</code>和<code>O(dn)</code>？</p>
+<p>这里计数排序和基数排序的时间复杂度为什么是<span class="math inline">\(O(n+k)\)</span>和<span class="math inline">\(O(dn)\)</span>？</p>
 <p>线性排序算法的时间复杂度比较低，适用场景比较特殊。如果要写一个通用的排序函数，不能选择线性排序算法。</p>
-<p>如果对小规模数据进行排序，可以选择时间复杂度是<code>O(n^2)</code>的算法；如果对大规模数据进行排序，时间复杂度是<code>O(nlogn)</code>的算法更加高效。所以，为了兼顾任意规模数据的排序，一般都会首选时间复杂度是<code>O(nlogn)</code>的排序算法来实现排序函数。</p>
-<p>时间复杂度是<code>O(nlogn)</code>的排序算法不止一个，除了快速排序和归并排序，还有堆排序。堆排序和快速排序都有比较多的应用。比如<code>Java</code>语言采用堆排序实现排序函数、<code>C</code>语言采用快速排序实现排序函数。</p>
-<p>快速排序在最坏情况下的时间复杂度是<code>O(n^2)</code>，而归并排序可以在平均情况、最坏情况下的时间复杂度都是<code>O(nlogn)</code>，但是由于归并排序并不是原地排序算法，空间复杂度是<code>O(n)</code>，因此没有得到广泛应用。</p>
+<p>如果对小规模数据进行排序，可以选择时间复杂度是<span class="math inline">\(O(n^2)\)</span>的算法；如果对大规模数据进行排序，时间复杂度是<span class="math inline">\(O(nlogn)\)</span>的算法更加高效。所以，为了兼顾任意规模数据的排序，一般都会首选时间复杂度是<span class="math inline">\(O(nlogn)\)</span>的排序算法来实现排序函数。</p>
+<p>时间复杂度是<span class="math inline">\(O(nlogn)\)</span>的排序算法不止一个，除了快速排序和归并排序，还有堆排序。堆排序和快速排序都有比较多的应用。比如<code>Java</code>语言采用堆排序实现排序函数、<code>C</code>语言采用快速排序实现排序函数。</p>
+<p>快速排序在最坏情况下的时间复杂度是<span class="math inline">\(O(n^2)\)</span>，而归并排序可以在平均情况、最坏情况下的时间复杂度都是<span class="math inline">\(O(nlogn)\)</span>，但是由于归并排序并不是原地排序算法，空间复杂度是<span class="math inline">\(O(n)\)</span>，因此没有得到广泛应用。</p>
 <h2 id="如何优化快速排序">如何优化快速排序</h2>
-<p>如果数据本身就是有序或者接近有序的，每次分区点选择最后一个数据，那么快速排序算法时间复杂度就会退化成<code>O(n^2)</code>。这种情况的出现的主要原因是分区点选的不够合理。</p>
+<p>如果数据本身就是有序或者接近有序的，每次分区点选择最后一个数据，那么快速排序算法时间复杂度就会退化成<span class="math inline">\(O(n^2)\)</span>。这种情况的出现的主要原因是分区点选的不够合理。</p>
 <p>最理想的分区点：<strong>被分区点分开的两个分区中，数据的数量差不多。</strong></p>
 <h3 id="三数取中法">三数取中法</h3>
 <p>从区间的首、尾、中间，分别取出一个数，然后对比大小，取这3个数的中间值作为分区点。这样每间隔某个固定的长度，取数据出来比较，将中间值作为分区点的分区算法，肯定要比单纯取某一个数据更好。但是，如果要排序的数组比较大，那“三数取中”可能就不够了，可能要“五数取中”或者“十数取中”。</p>
 <h3 id="随机法">随机法</h3>
-<p>随机法就是每次从要排序的区间中，随机选择一个元素作为分区点。这种方法并不能保证每次分区点都选的比较好，但是从概率的角度来看，也不大可能出现每次分区点都选得很差，所以，平均情况下，这样选的分区点是比较好的。时间复杂度退化为<code>O(n^2)</code>的情况，出现的可能性不大。</p>
+<p>随机法就是每次从要排序的区间中，随机选择一个元素作为分区点。这种方法并不能保证每次分区点都选的比较好，但是从概率的角度来看，也不大可能出现每次分区点都选得很差，所以，平均情况下，这样选的分区点是比较好的。时间复杂度退化为<span class="math inline">\(O(n^2)\)</span>的情况，出现的可能性不大。</p>
 <p>快速排序是用递归来实现的，递归要警惕堆栈溢出。</p>
 <h2 id="举例分析排序函数">举例分析排序函数</h2>
 <p><code>C</code>运行库<code>Glibc</code>中的<code>qsort()</code>函数举例说明。</p>
-<p><code>qsort()</code>会优先使用归并排序来排序输入数据。因为归并排序的空间复杂度是<code>O(n)</code>，对于小数据量的排序，比如1KB、2KB等，归并排序需要的空间可以忽略。</p>
+<p><code>qsort()</code>会优先使用归并排序来排序输入数据。因为归并排序的空间复杂度是<span class="math inline">\(O(n)\)</span>，对于小数据量的排序，比如1KB、2KB等，归并排序需要的空间可以忽略。</p>
 <p>但<strong>如果数据量太大，比如说100MB，<code>qsort()</code>会改为快速排序算法来排序。</strong><code>qsort()</code>选择分区点的方法就是“三数取中法”。对于递归太深会导致堆栈溢出的问题，<code>qsort()</code>是通过自己实现一个堆上的栈，手动模拟递归实现的。</p>
 <p>实际上，<code>qsort()</code>并不仅仅用到了归并排序和快速排序，还用到了插入排序。在快速排序的过程中，当要排序的区间中，元素的个数小于等于4时，<code>qsort()</code>就会退化为插入排序，不再继续使用递归来做快速排序。</p>
-<p><strong>在小规模数据中，<code>O(n^2)</code>时间复杂度的算法并不一定比<code>O(nlogn)</code>的算法执行时间长。</strong></p>
+<p><strong>在小规模数据中，<span class="math inline">\(O(n^2)\)</span>时间复杂度的算法并不一定比<span class="math inline">\(O(nlogn)\)</span>的算法执行时间长。</strong></p>
 <p>算法的性能可以通过时间复杂度来分析，但是，这种复杂度分析是比较偏理论的，实际上时间复杂度并不等于代码实际的运行时间。</p>
-<p>时间复杂度代表的是一个增长趋势，如果画成增长曲线，会发现<code>O(n^2)</code>比<code>O(nlogn)</code>增长趋势更猛一些，但是，在大<code>O</code>复杂度表示法中，会忽略低阶、系数和常数。也就是说，<code>O(nlogn)</code>在没有省略低阶、系数、常数之前可能是<code>O(knlogn+c)</code>，而且<code>k</code>和<code>c</code>有可能还是一个比较大的数。</p>
-<p>对于小规模数据的排序，<code>O(n^2)</code>的排序算法并不一定比<code>O(nlogn)</code>排序算法执行的时间长。对于小数据量的排序，选择比较简单、不需要递归的插入排序算法。</p>
+<p>时间复杂度代表的是一个增长趋势，如果画成增长曲线，会发现<span class="math inline">\(O(n^2)\)</span>比<span class="math inline">\(O(nlogn)\)</span>增长趋势更猛一些，但是，在大<code>O</code>复杂度表示法中，会忽略低阶、系数和常数。也就是说，<span class="math inline">\(O(nlogn)\)</span>在没有省略低阶、系数、常数之前可能是<span class="math inline">\(O(knlogn+c)\)</span>，而且<code>k</code>和<code>c</code>有可能还是一个比较大的数。</p>
+<p>对于小规模数据的排序，<span class="math inline">\(O(n^2)\)</span>的排序算法并不一定比<span class="math inline">\(O(nlogn)\)</span>排序算法执行的时间长。对于小数据量的排序，选择比较简单、不需要递归的插入排序算法。</p>
 <p>同时，<code>qsort()</code>排序算法中还通过哨兵来简化代码、提高执行效率。</p>
 <p>看来，一个优秀的源码是把各种细节做到了极致。不仅仅用到了三种排序算法，还考虑到递归潜在风险，通过手动实现堆来模拟递归以及哨兵模式。真的赞。</p>
 <h2 id="课后思考">课后思考</h2>
@@ -603,6 +602,68 @@ S_n = \frac{(1*\frac{1}{2}-n)}{\frac{1}{2}-1}=\frac{1-2n}{1-2}=2n-1
       <tags>
         <tag>极客时间</tag>
         <tag>数组</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>线性排序</title>
+    <url>/2021/10/17/%E7%BA%BF%E6%80%A7%E6%8E%92%E5%BA%8F/</url>
+    <content><![CDATA[<p>今天来学习三种时间复杂度是<code>O(n)</code>的排序算法：桶排序、计数排序、基数排序。</p>
+<span id="more"></span>
+<p>因为这些排序算法的时间复杂度是线性的，所以把这类排序算法叫做<strong>线性排序</strong>。之所以能做到线性的时间复杂度，主要原因是，这三个算法是非基于比较的排序算法，都不涉及元素之间的比较操作。</p>
+<p>学习重点是掌握这些排序算法的适用场景。</p>
+<h2 id="桶排序">桶排序</h2>
+<h3 id="核心思想">核心思想</h3>
+<p>将要排序的数据分到几个有序的桶里，每个桶里的数据再单独进行排序。桶内排完序之后，再把每个桶里的数据按照顺序依次取出，组成的序列就是有序的了。</p>
+<p><img src="bucket_sort.webp" /></p>
+<h3 id="时间复杂度">时间复杂度</h3>
+<p>如果要排序的数据有<code>n</code>个，把它均匀地划分到<code>m</code>个桶内，每个桶里就有<code>k=n/m</code>个元素。每个桶内部使用快速排序，时间复杂度为<code>O(k*logk)</code>。<code>m</code>个桶排序的时间复杂度就是<code>O(m*k*logk)</code>，因为<code>k=n/m</code>，所以整个桶排序的时间复杂度就是<code>O(n*log(n/m))</code>。当桶的个数<code>m</code>接近数据个数<code>n</code>时，<code>log(n/m)</code>就是一个非常小的常量，这个时候桶排序的时间复杂度接近<code>O(n)</code>。</p>
+<h3 id="空间复杂度">空间复杂度</h3>
+<p>空间复杂度为<code>O(n+m)</code>。</p>
+<h3 id="稳定性">稳定性</h3>
+<p>如果每次桶内使用快速排序，则桶排序是不稳定的。而每次桶内使用归并排序，则桶排序是稳定的排序算法。</p>
+<h3 id="前提条件">前提条件</h3>
+<p>首先，要排序的数据需要很容易就能划分成<code>m</code>个桶，并且，桶与桶之间有着天然的大小顺序。这样每个桶内的数据都排序完之后，桶与桶之间的数据不需要再进行排序。</p>
+<p>其次，数据在各个桶之间的分布是比较均匀的。</p>
+<h3 id="适用场景">适用场景</h3>
+<p><strong>桶排序比较适合用在外部排序中。</strong>所谓的外部排序就是数据存储在外部磁盘中，数据量比较大，内存有限，无法将数据全部加载到内存中。</p>
+<p>比如有10GB的订单数据，希望按订单金额（假设金额都是正整数）进行排序，但是内存有限，只有几百MB，没办法一次性把10GB的数据都加载到内存中，这时候该怎么办？</p>
+<p>先扫描一遍文件，看订单金额所处的数据范围。假设经过扫描之后我们得到，订单金额最小是1元，最大是10万元。我们将所有订单根据金额划分到100个桶里，第一个桶我们存储金额在1元到1000元之间的订单，第二桶存储金额在1001元到2000元之内的订单，以此类推。每个桶对应一个文件，并且按照金额范围的大小顺序编号命名（00，01，02...99）。</p>
+<p>理想的情况下，如果订单金额在1到10万之间均匀分布，那订单会被均匀划分到100个文件中，每个小文件中存储大约100MB的订单数据，就可以将这100个小文件依次放到内存中，用快排来排序。等所有文件都排好序之后，只需要按照文件编号，从小到大依次读取每个小文件中的订单数据，并将其写入到一个文件中，那这个文件中存储的就是按照金额从小到大排序的订单数据了。</p>
+<p>这里有一个问题，桶的实现方式是文件。还有就是需要注意的是，时间复杂度为<code>O(n)</code>，并不意味着只遍历一次，也可能是两次三次，这里遍历次数很小，系数可以忽略。<code>O(n)</code>指的是程序执行时间随数据规模呈线性关系。</p>
+<p>不过，订单按照金额在1元到10万元之间并不一定是均匀分布的，所以10GB订单数据是无法均匀地被划分到100个文件中的。有可能某个金额区间的数据特别多，划分之后对应的文件会很大，没法一次性读入内存。</p>
+<p>针对这些划分之后还是比较大的文件，可以继续划分，比如，订单金额在1元到1000元之间的比较多，就将这个区间继续划分为10个小区间，1元到100元，101元到200元...901元到1000元。如果划分之后，101元到200元之间的订单还是太多，无法一次性读入内存，那就继续再划分，直到所有的文件都能读入内存为止。</p>
+<h2 id="计数排序">计数排序</h2>
+<p><strong>计数排序其实是桶排序的一种特殊情况。</strong>当要排序的<code>n</code>个数据，所处的范围并不大的时候，比如最大值是<code>k</code>，就可以把数据划分成<code>k</code>个桶，每个桶内的数据值都是相同的，省掉了桶内排序的时间。计数排序的算法思想跟桶排序非常类似，只是桶的大小粒度不一样。桶排序的粒度是多个，而计数排序的粒度是一个。</p>
+<h3 id="适用场景-1">适用场景</h3>
+<p>如果所在的省有50万考生，如果通过成绩快速排序得出名次呢？</p>
+<p>考生的满分是900分，最小是0分，这个数据的范围很小，所以可以分成901个桶，对应分数从0分到900分。根据考生的成绩，将这50万考生划分到这901个桶里。桶内的数据都是分数相同的考生，所以并不需要再进行排序。只需要依次扫描每个桶，将桶内的考生依次输出到一个数组中，就实现了50万考生的排序。因为只涉及扫描遍历操作，时间复杂度为<code>O(n)</code>。</p>
+<p>和桶排序不同的是，计数排序中桶存的不是元素而是元素的数量。</p>
+<h3 id="总结">总结</h3>
+<p>计数排序只能用在数据范围不大的场景中，如果数据范围<code>k</code>比要排序的数据<code>n</code>大很多，就不适合用计数排序了。而且，计数排序只能给非负整数排序，如果要排序的数据是其他类型的，要将其在不改变相对大小的情况下，转化为非负整数。</p>
+<p>比如，还是拿考生这个例子。如果考生成绩精确到小数后一位，就需要将所有的分数都先乘以10，转化成整数，然后再放到9010个桶内。再比如，如果要排序的数据中有负数，数据的范围是<code>[-1000, 1000]</code>，那我们就需要先对每个数据都加1000，转化成非负整数。</p>
+<h2 id="基数排序">基数排序</h2>
+<h3 id="适用场景-2">适用场景</h3>
+<p>假设有10w个手机号码，希望将这10万个手机号码从小到大排序，有什么比较快速的排序方法？</p>
+<p>先按照最后一位来排序手机号码，然后，再按照倒数第二位重新排序，以此类推，最后按照第一位重新排序。经过11次排序之后，手机号码就都有序了。这里按照每位来排序的排序算法必须是稳定的，否则最后一次排序只会考虑最高位的大小顺序，完全不管其他位的大小关系，低位的排序就完全没有意义了。</p>
+<p>根据每一位来排序，可以用桶排序或者计数排序，时间复杂度可以做到<code>O(n)</code>。如果要排序的数据有<code>k</code>位，那么就需要<code>k</code>次桶排序或者计数排序，总的时间复杂度是<code>O(k*n)</code>。当<code>k</code>不大的时候，比如手机号码排序的例子，<code>k</code>最大就是11，所以基数排序的时间复杂度近似于<code>O(n)</code>。</p>
+<p>当排序的数据不是等长的的时候，可以把所有的单词补齐到相同长度，位数不够的可以在后面补“0”，因为根据<code>ASCII</code>值，所有字母都大于“0”，所以补“0”不会影响到原有的大小顺序。这样就可以继续使用基数排序了。</p>
+<h3 id="总结-1">总结</h3>
+<p>基数排序对要排序的数据是有要求的。需要可以分割出独立的“位”来比较，而且位之间有递进的关系，如果<code>a</code>数据的高位比<code>b</code>数据大，那剩下的低位就不用比较了。除此之外，每一位的数据范围不能太大，要可以用线性排序算法来排序，否则，基数排序的时间复杂度就无法做到<code>O(n)</code>了。</p>
+<h2 id="解答开篇">解答开篇</h2>
+<p>如何根据年龄给100w用户排序？</p>
+<p>实际上，根据年龄给100w用户排序，就类似按照成绩给50w考生排序。我们假设年龄的范围最小1岁，最大不超过120岁（或者可以通过遍历看一下年龄范围）。遍历这100w用户，根据年龄将其划分到这120个桶里，然后依次顺序遍历这120个桶中的元素，这样就得到了按照年龄排序的100w用户数据。</p>
+<p>那么，这种排序方式是桶排序还是计数排序呢？</p>
+<h2 id="课后思考">课后思考</h2>
+<p>假设现在需要对<code>D, a, F, B, c, A，z</code>这个字符串进行排序，要求将其中所有小写的字母都排在大写字母的前面，但小写字母内部和大写字母内部不要求有序。比如经过排序之后为<code>a, c, z, D, F, B, A</code>，这个该如何实现呢？如果字符串中存储的不仅有大小写字母，还有数字。要将小写字母的放到前面，大写字母的放到后面，数字放在中间，不用排序算法，该怎么解决？</p>
+<p>答案一：用两个指针<code>a</code>，<code>b</code>：<code>a</code>指针从头开始往后遍历，遇到大写字母就停下，<code>b</code>从后往前遍历，遇到小写字母就停下，交换<code>a</code>、<code>b</code>指针对应的元素；重复如上过程，直到<code>a</code>、<code>b</code>指针相交。对于小写字母放前面，数字放中间，大写字母放后面，可以先将数据分为小写字母和非小写字母两大类，进行如上交换再在非小写字母区间内分为数字和大写字母做同样处理。</p>
+<p>答案二：利用桶排序思想，共小写、大写、数字三个桶，遍历一遍，都放进去，然后再从桶中取出来。时间复杂度为<code>O(n)</code>。</p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>极客时间</tag>
+        <tag>线性排序</tag>
       </tags>
   </entry>
   <entry>
@@ -709,75 +770,13 @@ S_n = \frac{(1*\frac{1}{2}-n)}{\frac{1}{2}-1}=\frac{1-2n}{1-2}=2n-1
       </tags>
   </entry>
   <entry>
-    <title>线性排序</title>
-    <url>/2021/10/17/%E7%BA%BF%E6%80%A7%E6%8E%92%E5%BA%8F/</url>
-    <content><![CDATA[<p>今天来学习三种时间复杂度是<code>O(n)</code>的排序算法：桶排序、计数排序、基数排序。</p>
-<span id="more"></span>
-<p>因为这些排序算法的时间复杂度是线性的，所以把这类排序算法叫做<strong>线性排序</strong>。之所以能做到线性的时间复杂度，主要原因是，这三个算法是非基于比较的排序算法，都不涉及元素之间的比较操作。</p>
-<p>学习重点是掌握这些排序算法的适用场景。</p>
-<h2 id="桶排序">桶排序</h2>
-<h3 id="核心思想">核心思想</h3>
-<p>将要排序的数据分到几个有序的桶里，每个桶里的数据再单独进行排序。桶内排完序之后，再把每个桶里的数据按照顺序依次取出，组成的序列就是有序的了。</p>
-<p><img src="bucket_sort.webp" /></p>
-<h3 id="时间复杂度">时间复杂度</h3>
-<p>如果要排序的数据有<code>n</code>个，把它均匀地划分到<code>m</code>个桶内，每个桶里就有<code>k=n/m</code>个元素。每个桶内部使用快速排序，时间复杂度为<code>O(k*logk)</code>。<code>m</code>个桶排序的时间复杂度就是<code>O(m*k*logk)</code>，因为<code>k=n/m</code>，所以整个桶排序的时间复杂度就是<code>O(n*log(n/m))</code>。当桶的个数<code>m</code>接近数据个数<code>n</code>时，<code>log(n/m)</code>就是一个非常小的常量，这个时候桶排序的时间复杂度接近<code>O(n)</code>。</p>
-<h3 id="空间复杂度">空间复杂度</h3>
-<p>空间复杂度为<code>O(n+m)</code>。</p>
-<h3 id="稳定性">稳定性</h3>
-<p>如果每次桶内使用快速排序，则桶排序是不稳定的。而每次桶内使用归并排序，则桶排序是稳定的排序算法。</p>
-<h3 id="前提条件">前提条件</h3>
-<p>首先，要排序的数据需要很容易就能划分成<code>m</code>个桶，并且，桶与桶之间有着天然的大小顺序。这样每个桶内的数据都排序完之后，桶与桶之间的数据不需要再进行排序。</p>
-<p>其次，数据在各个桶之间的分布是比较均匀的。</p>
-<h3 id="适用场景">适用场景</h3>
-<p><strong>桶排序比较适合用在外部排序中。</strong>所谓的外部排序就是数据存储在外部磁盘中，数据量比较大，内存有限，无法将数据全部加载到内存中。</p>
-<p>比如有10GB的订单数据，希望按订单金额（假设金额都是正整数）进行排序，但是内存有限，只有几百MB，没办法一次性把10GB的数据都加载到内存中，这时候该怎么办？</p>
-<p>先扫描一遍文件，看订单金额所处的数据范围。假设经过扫描之后我们得到，订单金额最小是1元，最大是10万元。我们将所有订单根据金额划分到100个桶里，第一个桶我们存储金额在1元到1000元之间的订单，第二桶存储金额在1001元到2000元之内的订单，以此类推。每个桶对应一个文件，并且按照金额范围的大小顺序编号命名（00，01，02...99）。</p>
-<p>理想的情况下，如果订单金额在1到10万之间均匀分布，那订单会被均匀划分到100个文件中，每个小文件中存储大约100MB的订单数据，就可以将这100个小文件依次放到内存中，用快排来排序。等所有文件都排好序之后，只需要按照文件编号，从小到大依次读取每个小文件中的订单数据，并将其写入到一个文件中，那这个文件中存储的就是按照金额从小到大排序的订单数据了。</p>
-<p>这里有一个问题，桶的实现方式是文件。还有就是需要注意的是，时间复杂度为<code>O(n)</code>，并不意味着只遍历一次，也可能是两次三次，这里遍历次数很小，系数可以忽略。<code>O(n)</code>指的是程序执行时间随数据规模呈线性关系。</p>
-<p>不过，订单按照金额在1元到10万元之间并不一定是均匀分布的，所以10GB订单数据是无法均匀地被划分到100个文件中的。有可能某个金额区间的数据特别多，划分之后对应的文件会很大，没法一次性读入内存。</p>
-<p>针对这些划分之后还是比较大的文件，可以继续划分，比如，订单金额在1元到1000元之间的比较多，就将这个区间继续划分为10个小区间，1元到100元，101元到200元...901元到1000元。如果划分之后，101元到200元之间的订单还是太多，无法一次性读入内存，那就继续再划分，直到所有的文件都能读入内存为止。</p>
-<h2 id="计数排序">计数排序</h2>
-<p><strong>计数排序其实是桶排序的一种特殊情况。</strong>当要排序的<code>n</code>个数据，所处的范围并不大的时候，比如最大值是<code>k</code>，就可以把数据划分成<code>k</code>个桶，每个桶内的数据值都是相同的，省掉了桶内排序的时间。计数排序的算法思想跟桶排序非常类似，只是桶的大小粒度不一样。桶排序的粒度是多个，而计数排序的粒度是一个。</p>
-<h3 id="适用场景-1">适用场景</h3>
-<p>如果所在的省有50万考生，如果通过成绩快速排序得出名次呢？</p>
-<p>考生的满分是900分，最小是0分，这个数据的范围很小，所以可以分成901个桶，对应分数从0分到900分。根据考生的成绩，将这50万考生划分到这901个桶里。桶内的数据都是分数相同的考生，所以并不需要再进行排序。只需要依次扫描每个桶，将桶内的考生依次输出到一个数组中，就实现了50万考生的排序。因为只涉及扫描遍历操作，时间复杂度为<code>O(n)</code>。</p>
-<p>和桶排序不同的是，计数排序中桶存的不是元素而是元素的数量。</p>
-<h3 id="总结">总结</h3>
-<p>计数排序只能用在数据范围不大的场景中，如果数据范围<code>k</code>比要排序的数据<code>n</code>大很多，就不适合用计数排序了。而且，计数排序只能给非负整数排序，如果要排序的数据是其他类型的，要将其在不改变相对大小的情况下，转化为非负整数。</p>
-<p>比如，还是拿考生这个例子。如果考生成绩精确到小数后一位，就需要将所有的分数都先乘以10，转化成整数，然后再放到9010个桶内。再比如，如果要排序的数据中有负数，数据的范围是<code>[-1000, 1000]</code>，那我们就需要先对每个数据都加1000，转化成非负整数。</p>
-<h2 id="基数排序">基数排序</h2>
-<h3 id="适用场景-2">适用场景</h3>
-<p>假设有10w个手机号码，希望将这10万个手机号码从小到大排序，有什么比较快速的排序方法？</p>
-<p>先按照最后一位来排序手机号码，然后，再按照倒数第二位重新排序，以此类推，最后按照第一位重新排序。经过11次排序之后，手机号码就都有序了。这里按照每位来排序的排序算法必须是稳定的，否则最后一次排序只会考虑最高位的大小顺序，完全不管其他位的大小关系，低位的排序就完全没有意义了。</p>
-<p>根据每一位来排序，可以用桶排序或者计数排序，时间复杂度可以做到<code>O(n)</code>。如果要排序的数据有<code>k</code>位，那么就需要<code>k</code>次桶排序或者计数排序，总的时间复杂度是<code>O(k*n)</code>。当<code>k</code>不大的时候，比如手机号码排序的例子，<code>k</code>最大就是11，所以基数排序的时间复杂度近似于<code>O(n)</code>。</p>
-<p>当排序的数据不是等长的的时候，可以把所有的单词补齐到相同长度，位数不够的可以在后面补“0”，因为根据<code>ASCII</code>值，所有字母都大于“0”，所以补“0”不会影响到原有的大小顺序。这样就可以继续使用基数排序了。</p>
-<h3 id="总结-1">总结</h3>
-<p>基数排序对要排序的数据是有要求的。需要可以分割出独立的“位”来比较，而且位之间有递进的关系，如果<code>a</code>数据的高位比<code>b</code>数据大，那剩下的低位就不用比较了。除此之外，每一位的数据范围不能太大，要可以用线性排序算法来排序，否则，基数排序的时间复杂度就无法做到<code>O(n)</code>了。</p>
-<h2 id="解答开篇">解答开篇</h2>
-<p>如何根据年龄给100w用户排序？</p>
-<p>实际上，根据年龄给100w用户排序，就类似按照成绩给50w考生排序。我们假设年龄的范围最小1岁，最大不超过120岁（或者可以通过遍历看一下年龄范围）。遍历这100w用户，根据年龄将其划分到这120个桶里，然后依次顺序遍历这120个桶中的元素，这样就得到了按照年龄排序的100w用户数据。</p>
-<p>那么，这种排序方式是桶排序还是计数排序呢？</p>
-<h2 id="课后思考">课后思考</h2>
-<p>假设现在需要对<code>D, a, F, B, c, A，z</code>这个字符串进行排序，要求将其中所有小写的字母都排在大写字母的前面，但小写字母内部和大写字母内部不要求有序。比如经过排序之后为<code>a, c, z, D, F, B, A</code>，这个该如何实现呢？如果字符串中存储的不仅有大小写字母，还有数字。要将小写字母的放到前面，大写字母的放到后面，数字放在中间，不用排序算法，该怎么解决？</p>
-<p>答案一：用两个指针<code>a</code>，<code>b</code>：<code>a</code>指针从头开始往后遍历，遇到大写字母就停下，<code>b</code>从后往前遍历，遇到小写字母就停下，交换<code>a</code>、<code>b</code>指针对应的元素；重复如上过程，直到<code>a</code>、<code>b</code>指针相交。对于小写字母放前面，数字放中间，大写字母放后面，可以先将数据分为小写字母和非小写字母两大类，进行如上交换再在非小写字母区间内分为数字和大写字母做同样处理。</p>
-<p>答案二：利用桶排序思想，共小写、大写、数字三个桶，遍历一遍，都放进去，然后再从桶中取出来。时间复杂度为<code>O(n)</code>。</p>
-]]></content>
-      <categories>
-        <category>数据结构与算法</category>
-      </categories>
-      <tags>
-        <tag>极客时间</tag>
-        <tag>线性排序</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>跳表</title>
     <url>/2021/10/24/%E8%B7%B3%E8%A1%A8/</url>
     <content><![CDATA[<p>今天来学习跳表。</p>
 <span id="more"></span>
 <p>二分查找底层依赖的是数组随机访问的特性，所以只能用数组来实现。如果数据存储在链表中，对链表稍加改造，也可以支持类似“二分”的查找算法，这种改造之后的数据结构叫做跳表。这里我感觉，每一种数据结构的出现都有它出现的历史背景，但这也同时也决定了它的应用场景。</p>
 <h2 id="如何理解跳表">如何理解“跳表”</h2>
-<p>对于一个单链表来讲，即便链表中存储的数据是有序的，如果要想在其中查找某个数据，也只能从头到尾遍历链表。时间复杂度为<code>O(n)</code>。</p>
+<p>对于一个单链表来讲，即便链表中存储的数据是有序的，如果要想在其中查找某个数据，也只能从头到尾遍历链表。时间复杂度为<span class="math inline">\(O(n)\)</span>。</p>
 <p>那么如何提高效率？比如像图中那样，对链表建立一级“索引”。每两个结点提取一个结点到上一级，把提取出来结点的这一层叫做<strong>索引</strong>或<strong>索引层</strong>。图里的<code>down</code>表示<code>down</code>指针，指向下一级结点。</p>
 <p><img src="skip_table_example.webp" /></p>
 <p>这里的<code>down</code>不是特别明白，是类似单链表结点中<code>next</code>指针，也单独开辟一块空间，来存储<code>down</code>指针么？</p>
@@ -801,10 +800,10 @@ S_n=\frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{2*\frac{1}{2}-\frac{n}{2}
 \frac{n}{3},\frac{n}{6},\frac{n}{9}...9,6,3
 \]</span> 根据求和公式，公比为<span class="math inline">\(\frac{1}{3}\)</span> <span class="math display">\[
 S_n=\frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{3*\frac{1}{3}-\frac{n}{3}}{\frac{1}{3}-1}=\frac{1}{2}(n-3)
-\]</span> 尽管空间复杂度依然为<code>O(n)</code>，但是相比之下，还是减少了一半的索引结点存储空间。</p>
+\]</span> 尽管空间复杂度依然为<span class="math inline">\(O(n)\)</span>，但是相比之下，还是减少了一半的索引结点存储空间。</p>
 <p>实际上，在软件开发中，不必太在意索引占用的额外空间。在讲数据结构与算法时，习惯性地把要处理的数据看成整数，但是在实际的软件开发中，原始链表中存储的有可能是很大的对象，而索引结点只需要存储关键值和几个指针，并不需要存储对象，所以当对象比索引节点大很多时，那索引占用的额外空间就可以忽略了。</p>
 <h2 id="高效的动态插入和删除">高效的动态插入和删除</h2>
-<p>跳表不仅支持查找操作，还支持动态的插入、删除操作，而且插入、删除操作的时间复杂度也是<code>O(logn)</code>。这个很好理解，查找时间复杂度为<code>O(logn)</code>，单纯插入和删除的时间复杂度为<code>O(1)</code>。根据时间复杂度求和公式，<strong>总复杂度等于量级最大的那段代码的复杂度</strong>，所以插入、删除操作的时间复杂度为<code>O(logn)</code>。</p>
+<p>跳表不仅支持查找操作，还支持动态的插入、删除操作，而且插入、删除操作的时间复杂度也是<span class="math inline">\(O(logn)\)</span>。这个很好理解，查找时间复杂度为<span class="math inline">\(O(logn)\)</span>，单纯插入和删除的时间复杂度为<span class="math inline">\(O(1)\)</span>。根据时间复杂度求和公式，<strong>总复杂度等于量级最大的那段代码的复杂度</strong>，所以插入、删除操作的时间复杂度为<span class="math inline">\(O(logn)\)</span>。</p>
 <p>需要注意的是，在删除操作中，如果这个结点在索引中也有出现，除了要删除原始链表中的结点，还要删除索引中的结点。</p>
 <h2 id="跳表索引动态更新">跳表索引动态更新</h2>
 <p>当不停地往跳表中插入数据时，如果不更新索引，就有可能出现某2个索引结点之间数据非常多的情况。极端情况下，跳表还会退化成单链表。</p>
@@ -822,13 +821,13 @@ S_n=\frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{3*\frac{1}{3}-\frac{n}{3}
 <li>按照区间查找数据（比如查找值在<code>[100, 356]</code>之间的数据）</li>
 <li>迭代输出有序序列</li>
 </ol>
-<p>其实，插入、删除、查找以及迭代输出有序序列这几个操作，红黑树也可以完成。时间复杂度和跳表是一样的。但是，按照区间来查找数据这个操作，红黑树的效率没有跳表高。对于按照区间查找数据这个操作，跳表可以做到<code>O(logn)</code>的时间复杂度定位区间的起点，然后在原始链表中顺序往后遍历就可以了。</p>
+<p>其实，插入、删除、查找以及迭代输出有序序列这几个操作，红黑树也可以完成。时间复杂度和跳表是一样的。但是，按照区间来查找数据这个操作，红黑树的效率没有跳表高。对于按照区间查找数据这个操作，跳表可以做到<span class="math inline">\(O(logn)\)</span>的时间复杂度定位区间的起点，然后在原始链表中顺序往后遍历就可以了。</p>
 <p>其次，相比红黑树，跳表更容易代码实现。</p>
 <p>还有，跳表更加灵活，可以通过改变索引构建策略，有效平衡执行效率和内存消耗。</p>
 <p>不过，跳表也不能完全替代红黑树。因为红黑树比跳表的出现要早一些，很多编程语言中的<code>Map</code>类型都是通过红黑树来实现。但是跳表并没有现成的实现。</p>
 <h2 id="课后思考">课后思考</h2>
 <p>如果每三个或者五个结点提取一个结点作为上级索引，对应的在跳表中的查询数据的时间复杂度是多少？</p>
-<p>如果是每三个结点提取一个结点作为上级索引，<span class="math inline">\(\frac{n}{3^k}=3\)</span>，此时<span class="math inline">\(k=log_3n-1\)</span>，算上原始链表，层数为<span class="math inline">\(log_3n\)</span>，每一层需要遍历4个结点，所以时间复杂度为<span class="math inline">\(O(n)=4*log_3n\)</span>，忽略系数，<code>O(n)=logn</code>。同理每五个结点。</p>
+<p>如果是每三个结点提取一个结点作为上级索引，<span class="math inline">\(\frac{n}{3^k}=3\)</span>，此时<span class="math inline">\(k=log_3n-1\)</span>，算上原始链表，层数为<span class="math inline">\(log_3n\)</span>，每一层需要遍历4个结点，所以时间复杂度为<span class="math inline">\(O(n)=4*log_3n\)</span>，忽略系数，<span class="math inline">\(O(n)=logn\)</span>。同理每五个结点。</p>
 ]]></content>
       <categories>
         <category>数据结构与算法</category>
