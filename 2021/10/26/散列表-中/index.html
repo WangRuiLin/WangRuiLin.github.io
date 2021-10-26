@@ -238,7 +238,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>5k</span>
+              <span>5.2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -350,11 +350,13 @@
 <h2 id="课后思考">课后思考</h2>
 <p>在你熟悉的编程语言中，哪些数据类型底层是基于散列表实现的？散列函数是如何设计的？散列冲突是通过哪种方法解决的？是否支持动态扩容呢？</p>
 <p><code>Python</code>中数据类型<code>dict</code>底层是基于散列表来实现的。通过类似开放寻址法来解决散列冲突的。同时支持动态扩容。</p>
+<p>本篇文章中其实有很多知识点没搞清楚，比如说<code>Java</code>中的<code>hashCode()</code>到底是怎么实现的？看了下<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/33915892">java中的hashCode是怎么来的</a>，表示没搞清楚。还有<code>Python</code>中的<code>hash()</code>是怎么实现的？散列函数是如何设计的？装载因子等于多少的时候会自动扩容，扩容大小是多少？<a target="_blank" rel="noopener" href="https://github.com/python/cpython/blob/main/Objects/dictobject.c">Python-dict源码地址</a>，表示没看懂。</p>
 <p>参考链接：</p>
 <ol type="1">
 <li><a target="_blank" rel="noopener" href="https://blog.csdn.net/sufu1065/article/details/104954306">HashMap 为什么在链表长度为 8 的时候转红黑树，为啥不能是 9 是 10？</a></li>
 <li><a target="_blank" rel="noopener" href="https://blog.csdn.net/Liu_Wd/article/details/108052428">详解：HashMap红黑树的阈值为什么是8？</a></li>
 <li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/74003719">Python字典dict实现原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/33915892">java中的hashCode是怎么来的</a></li>
 </ol>
 
     </div>
@@ -393,7 +395,10 @@
     <a href="/2021/10/25/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%8A/" rel="prev" title="散列表(上)">
       <i class="fa fa-chevron-left"></i> 散列表(上)
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2021/10/26/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%8B/" rel="next" title="散列表(下)">
+      散列表(下) <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -468,7 +473,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
