@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"linlan.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="接着来学一下散列表（中）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="散列表(中)">
+<meta property="og:url" content="https://linlan.top/2021/10/26/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%AD/index.html">
+<meta property="og:site_name" content="Violin&#39;s Blog">
+<meta property="og:description" content="接着来学一下散列表（中）。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://linlan.top/2021/10/26/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%AD/hash_table.webp">
+<meta property="article:published_time" content="2021-10-25T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-10-25T16:00:00.000Z">
+<meta property="article:author" content="WangRuilin">
+<meta property="article:tag" content="极客时间">
+<meta property="article:tag" content="散列表">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://linlan.top/2021/10/26/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%AD/hash_table.webp">
+
+<link rel="canonical" href="https://linlan.top/2021/10/26/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%AD/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>散列表(中) | Violin's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Violin's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://linlan.top/2021/10/26/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%AD/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="WangRuilin">
+      <meta itemprop="description" content="日常记录">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Violin's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          散列表(中)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-10-26 00:00:00" itemprop="dateCreated datePublished" datetime="2021-10-26T00:00:00+08:00">2021-10-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>13 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>接着来学一下散列表（中）。</p>
+<span id="more"></span>
+<p>散列表的查询效率并不能笼统地说成是<span class="math inline">\(O(1)\)</span>。它跟散列函数、装载因子、散列冲突等都有关系。如果散列函数设计地不好，或者装载因子过高，都可能导致散列冲突的概率升高，查询效率下降。</p>
+<p>在极端情况下，有些恶意的攻击者，还有可能通过精心构造的数据，使得所有的数据经过散列函数之后，都散列到同一个槽里。如果使用的是基于链表的冲突解决办法，那么，散列表就会退化为链表，查询的时间复杂度就会从<span class="math inline">\(O(1)\)</span>急剧退化为<span class="math inline">\(O(n)\)</span>。</p>
+<p>如果散列表中有10万个数据，退化后的散列表查询的效率就下降了10万倍。更直接点，如果之前运行100次查询只需要0.1秒，那现在就需要1万秒。这样就有可能因为查询操作消耗大量CPU或者线程资源，导致系统无法响应其他请求，从而达到服务攻击（DoS）的目的。这也是散列表碰撞攻击的基本原理。</p>
+<h2 id="如何设计散列函数">如何设计散列函数</h2>
+<p>首先，<strong>散列函数的设计不能太复杂</strong>。过于复杂的散列函数，势必会消耗很多计算时间，也间接地影响到散列表的性能。其次，<strong>散列函数生成的值要尽可能随机并且均匀分布</strong>，这样才能避免或者最小化散列冲突，而且即使出现冲突，散列到每个槽里的数据也会比较平均，不会出现某个槽内数据特别多的情况。</p>
+<p>第一个例子就是学生运动会的例子，通过分析参赛编号的特征，把编号中的后两位做为散列值。类似的散列函数处理手机号码，取手机号的后四位作为散列值。这种设计方法一般叫做“数据分析法”。</p>
+<p>散列函数的设计方法还有很多，比如直接寻址法，平方取中法、折叠法、随机数法等。</p>
+<h2 id="装载因子过大">装载因子过大</h2>
+<p>装载因子越大，说明散列表中的元素越多，空闲位置越少，散列冲突的概率就越大。</p>
+<p>对于动态散列表来说，数据集合是频繁变动的，事先无法预估将要加入的数据个数，所以也无法事先申请一个足够大的散列表。随着数据慢慢加入，装载因子会慢慢变大。当装载因子大到一定程度之后，散列冲突就会变得不可接受。</p>
+<p>针对散列表，当装载因子过大时，可以进行动态扩容，重新申请一个更大的散列表，将数据搬移到这个新散列表中。假设每次扩容都申请一个原来散列表大小两倍的空间。如果原来散列表的的装载因子是0.8，那经过扩容之后，新散列表的装载因子就下降为原来的一半，变成了0.4。</p>
+<p>针对数据的扩容，数据搬移比较简单。但是针对散列表的扩容，数据搬移操作要复杂很多。因为散列表的大小变了，数据的存储位置也变了，所以需要通过散列函数重新计算每个数据的存储位置。</p>
+<p>插入一个数据，最好情况下，不需要扩容，最好时间复杂度为<span class="math inline">\(O(1)\)</span>。最坏情况下，散列表装载因子过高，启动扩容，需要重新申请内存空间，重新计算哈希位置，并且搬移数据，所以时间复杂度为<span class="math inline">\(O(n)\)</span>。通过摊还分析法，均摊情况下，时间复杂度接近最好情况，就是<span class="math inline">\(O(1)\)</span>。</p>
+<p>实际上，对于动态散列表，随着数据的删除，散列表中的数据会越来越少，空闲空间会越来越多。如果对空间消耗非常敏感，可以在装载因子小于某个值之后，启动动态缩容。反之则不需要。</p>
+<p>装载因子阈值设置需要得当。如果太大，会导致冲突过多；如果过小，会导致内存浪费严重。需要权衡时间、空间复杂度。如果内存空间不紧张，对执行效率要求很高，可以降低负载因子的阈值；反之可以增大装载因子的阈值。</p>
+<h2 id="如何避免低效扩容">如何避免低效扩容</h2>
+<p>大部分情况下，动态扩容的散列表插入一个数据都很快，但是在特殊情况下，当装载因子已经达到阈值，需要先进行扩容，再插入数据。这个时候，插入数据就会变得很慢，甚至无法接受。</p>
+<p>这个时候，“一次性”扩容的机制就不合适了。为了解决一次性扩容耗时过多的情况，可以将扩容操作穿插在插入操作的过程中，分批完成。</p>
+<p>当有新数据要插入时，将新数据插入新散列表中，并且从老的散列表中拿出一个数据放入到新散列表。每次插入一个数据到散列表，都重复上面的过程。经过多次插入操作之后，老的散列表中的数据就一点一点全部搬移到新散列表中。</p>
+<p><img src="hash_table.webp" /></p>
+<p>对于查询操作，为了兼容新、老散列表中的数据，先从散列表中查找，如果没找到，再去老的散列表中查找。</p>
+<p>通过这样均摊的方法，将一次性扩容的代价，均摊到多次插入操作中，就避免了一次性扩容耗时过多的情况。这种实现方式，任何情况下，插入一个数据的时间复杂度都是<span class="math inline">\(O(1)\)</span>。</p>
+<h2 id="如何选择冲突解决方法">如何选择冲突解决方法</h2>
+<ol type="1">
+<li><p>开放寻址法</p>
+<p>优点：散列表中的数据都存储在数组中，可以有效地利用CPU缓存加快查询速度。而且，序列化起来比较简单</p>
+<p>缺点：删除数据的时候比较麻烦，需要特殊标记已经删除掉的数据。而且，在开放寻址法中，所有的数据都存储在一个数组中，比起链表来说，冲突的代价更高。</p>
+<p>总结：当数据量比较小、装载因子小的时候，适合采用开放寻址法。这也是<code>Java</code>中<code>ThreadLocalMap</code>使用开放寻址法解决散列冲突的原因。</p></li>
+<li><p>链表法</p>
+<p>优点：链表法对内存的利用率比开放寻址法更高。其次，链表法对大装载因子的容忍度更高，只要散列函数的值随机均匀，即便装载因子变成10，也就是链表的长度变长了而已，虽然查找效率有所下降，但是比顺序查找还是快很多。</p>
+<p>缺点：链表要存储指针，是比较消耗内存的。其次，链表中的结点时零散分布在内存中，是不连续的，对CPU缓存不友好。</p>
+<p>总结：基于链表的散列冲突处理方法比较适合存储大对象，大数据量的散列表，而且，比起开放寻址法，更加灵活，支持更多的优化策略，比如用红黑树代替链表。</p></li>
+</ol>
+<h2 id="工业级散列表举例分析">工业级散列表举例分析</h2>
+<p>以<code>Java</code>中的<code>HashMap</code>这样的工业级散列表举例说明。</p>
+<h3 id="初始大小">初始大小</h3>
+<p><code>HashMap</code>默认的初始大小是16。如果事先直到大概的数据量有多大，可以通过修改默认初始大小，减少动态扩容的次数，这样会大大提高<code>HashMap</code>的性能。</p>
+<h3 id="装载因子和动态扩容">装载因子和动态扩容</h3>
+<p>最大装载因子默认是0.75，当<code>HashMap</code>中元素个数超过<code>0.75*capacity</code>（<code>capacity</code>表示散列表的容量）的时候，就会启动扩容，每次扩容都会扩容为原来的两倍大小。</p>
+<h3 id="散列冲突解决办法">散列冲突解决办法</h3>
+<p><code>HashMap</code>底层采用链表法来解决冲突。在<code>JDK1.8</code>版本中，对<code>HashMap</code>做进一步优化，引入了红黑树。当链表长度太长（默认超过8）时，链表就转换为红黑树，可以利用红黑树快速增删改查的特性，提高<code>HashMap</code>的性能。当红黑树结点个数少于8个的时候，又会将红黑树转换为链表。</p>
+<p>评论区中有大佬指出，当<code>HashMap</code>中结点少于6时，会由红黑树变成链表，当<code>HashMap</code>中结点数为6时，链表的平均查找<code>6/2=3</code>。当<code>HashMap</code>中结点多于8时，会由链表变成红黑树，红黑树的平均查找为<span class="math inline">\(log_28=3\)</span>，如果继续使用链表，平均查找长度<code>8/2=4</code>，这才有转换为树的必要。还有一个问题就是6和8的选择，6和8之间有一个7可以有效防止链表和红黑树频繁转换。假设一下如果设计成<code>HashMap</code>中数据超过8，由链表转换成红黑树；<code>HashMap</code>中数据少于8，由红黑树转换成链表。若一个<code>HashMap</code>不停地插入、删除，<code>HashMap</code>中的个数不停地在8左右徘徊，就会频繁发生链表转红黑树，红黑树转链表，效率会非常低。</p>
+<p>这里自己翻了一下，有三个问题，这里记录一下</p>
+<p>1.为什么要转红黑树？</p>
+<p>因为查找元素，红黑树的时间复杂度为<span class="math inline">\(O(logn)\)</span>，而链表的时间复杂度是<span class="math inline">\(O(n)\)</span></p>
+<p>2.为什么不直接使用红黑树，而是要先使用链表，链表结点大于8后，再转为红黑树？</p>
+<p>这个问题，在<code>HashMap</code>源码中的174行注释中写到，<code>Because TreeNodes are about twice the size of regular nodes, we use them only when bins contain enough nodes to warrant use (see TREEIFY_THRESHOLD)</code>。意思就是因为树节点是链表结点大小的两倍，所以只有在容器中包含足够的结点保证才会使用它。尽管红黑树的查找效率更高，但是在结点数比较小的时候，对于红黑树来说内存的劣势会超过查找等操作的优势，自然使用链表更好。</p>
+<p>3.为什么链表结点大于8时转为红黑树，而不是9、10？</p>
+<p>这一点也是源码中179行注释中写到，源码的贡献者进行大量实验发现，<code>hash</code>碰撞发生8次的概率已经降低到了<code>0.00000006</code>，再往后调整并没有很大意义。理想情况下，在随机哈希码下，哈希表中结点的频率遵循泊松分布。</p>
+<h3 id="散列函数">散列函数</h3>
+<p>散列函数的设计并不复杂，追求的是简单高效、分布均匀。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> h = key.hashCode();</span><br><span class="line">    <span class="keyword">return</span> (h ^ (h &gt;&gt;&gt; <span class="number">16</span>)) &amp; (capicity -<span class="number">1</span>); <span class="comment">//capicity表示散列表的大小</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>hashCode()</code>返回的是<code>Java</code>对象的<code>hash code</code>。<code>String</code>类型的对象的<code>hashCode()</code>如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> var1 = <span class="keyword">this</span>.hash;</span><br><span class="line">    <span class="keyword">if</span>(var1 == <span class="number">0</span> &amp;&amp; <span class="keyword">this</span>.value.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="keyword">char</span>[] var2 = <span class="keyword">this</span>.value;</span><br><span class="line">      <span class="keyword">for</span>(<span class="keyword">int</span> var3 = <span class="number">0</span>; var3 &lt; <span class="keyword">this</span>.value.length; ++var3) &#123;</span><br><span class="line">        var1 = <span class="number">31</span> * var1 + var2[var3];</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">this</span>.hash = var1;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> var1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结合评论区的讨论，这里记录一下。</p>
+<p>第一步，根据<code>key</code>通过<code>hashCode()</code>得到<code>hash</code>值，具体代码实现<code>int h = key.hashCode();</code></p>
+<p>第二步，将得到的<code>hash</code>值映射到数组中的位置，具体代码实现<code>(h ^ (h &gt;&gt;&gt; 16)) &amp; (capacity - 1)</code>。</p>
+<p>然后把评论区原答案也放到这里吧。<code>JDK hashMap</code>源码，<code>hash</code>表中数组位置的计算分两步：</p>
+<p>1.计算<code>hash</code>值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hash(Object key) &#123;</span><br><span class="line">    <span class="keyword">int</span> h;</span><br><span class="line">    <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这一步有一种说法，叫它扰动函数，为什么要右移16位再与本身异或呢？</p>
+<ol type="1">
+<li>首先<code>hashCode()</code>返回值<code>int</code>最高是32位，如果直接拿<code>hashCode()</code>返回值作为下标，大概40亿（2的32次幂=4294967296）的映射空间，只要哈希函数映射的比较均匀松散，一般是很难出现碰撞的。问题是一个40亿长度的数组，内存是放不下的。</li>
+<li>所以，用自己的高半区和底半区做异或，混合原始哈希码的高位和低位，关键是以此来加大低位的随机性。为后续计算<code>index</code>截取低位，保证低位的随机性。</li>
+<li>这样设计保证了对象的<code>hashCode</code>的32位值只要有一位发生改变，整个<code>hash()</code>返回值就会改变，高位的变化会反应到低位里，保证了<code>hash</code>值的随机性。</li>
+</ol>
+<p>2.在插入或者查找的时候，计算<code>key</code>被映射到桶的位置：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int index = hash(key) &amp; (capacity - 1)</span><br></pre></td></tr></table></figure>
+<p><code>hash()</code>扰动函数计算的值和<code>hash</code>表当前的容量减一，做按位与运算。</p>
+<p>这一步，为什么要减一，又为什么要按位与运算？因为<code>A % B = A &amp; (B-1)</code>，当B是2的指数时，等式成立。本质上使用了<code>除留余数法</code>，保证了<code>index</code>的位置分布均匀。</p>
+<p>为什么<code>HashMap</code>的数组长度必须是2的整次幂？数组长度是2的整次幂时，（数组长度-1）正好相当于一个“低位掩码”，“与”操作的结果就是散列值的高位全部归零，只保留低位值，用来做数组下标来访问。</p>
+<h2 id="解答开篇">解答开篇</h2>
+<p>如何设计一个工业级的散列函数？</p>
+<ol type="1">
+<li>工业级的散列表应该具有哪些特性？
+<ul>
+<li>快速地查询、插入、删除操作</li>
+<li>内存占用合理，不能浪费过多的内存空间</li>
+<li>性能稳定，极端情况下，散列表的性能也不会退化到无法接受的情况</li>
+</ul></li>
+<li>如何实现一个这样的散列表？
+<ul>
+<li>设计一个合适的散列函数</li>
+<li>定义装载因子阈值，并且设计动态扩容策略</li>
+<li>选择合适的散列冲突解决办法</li>
+</ul></li>
+</ol>
+<p>此外，还需要结合具体的业务场景、具体的业务数据来具体分析。</p>
+<h2 id="课后思考">课后思考</h2>
+<p>在你熟悉的编程语言中，哪些数据类型底层是基于散列表实现的？散列函数是如何设计的？散列冲突是通过哪种方法解决的？是否支持动态扩容呢？</p>
+<p><code>Python</code>中数据类型<code>dict</code>底层是基于散列表来实现的。通过类似开放寻址法来解决散列冲突的。同时支持动态扩容。</p>
+<p>参考链接：</p>
+<ol type="1">
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/sufu1065/article/details/104954306">HashMap 为什么在链表长度为 8 的时候转红黑树，为啥不能是 9 是 10？</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/Liu_Wd/article/details/108052428">详解：HashMap红黑树的阈值为什么是8？</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/74003719">Python字典dict实现原理</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>您的支持将鼓励我继续创作！</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="WangRuilin 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9E%81%E5%AE%A2%E6%97%B6%E9%97%B4/" rel="tag"># 极客时间</a>
+              <a href="/tags/%E6%95%A3%E5%88%97%E8%A1%A8/" rel="tag"># 散列表</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/10/25/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%8A/" rel="prev" title="散列表(上)">
+      <i class="fa fa-chevron-left"></i> 散列表(上)
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E6%95%A3%E5%88%97%E5%87%BD%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">如何设计散列函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A3%85%E8%BD%BD%E5%9B%A0%E5%AD%90%E8%BF%87%E5%A4%A7"><span class="nav-number">2.</span> <span class="nav-text">装载因子过大</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D%E4%BD%8E%E6%95%88%E6%89%A9%E5%AE%B9"><span class="nav-number">3.</span> <span class="nav-text">如何避免低效扩容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9%E5%86%B2%E7%AA%81%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">如何选择冲突解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E4%B8%9A%E7%BA%A7%E6%95%A3%E5%88%97%E8%A1%A8%E4%B8%BE%E4%BE%8B%E5%88%86%E6%9E%90"><span class="nav-number">5.</span> <span class="nav-text">工业级散列表举例分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%A4%A7%E5%B0%8F"><span class="nav-number">5.1.</span> <span class="nav-text">初始大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A3%85%E8%BD%BD%E5%9B%A0%E5%AD%90%E5%92%8C%E5%8A%A8%E6%80%81%E6%89%A9%E5%AE%B9"><span class="nav-number">5.2.</span> <span class="nav-text">装载因子和动态扩容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%A3%E5%88%97%E5%86%B2%E7%AA%81%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="nav-number">5.3.</span> <span class="nav-text">散列冲突解决办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%A3%E5%88%97%E5%87%BD%E6%95%B0"><span class="nav-number">5.4.</span> <span class="nav-text">散列函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E7%AD%94%E5%BC%80%E7%AF%87"><span class="nav-number">6.</span> <span class="nav-text">解答开篇</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E5%90%8E%E6%80%9D%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">课后思考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="WangRuilin"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">WangRuilin</p>
+  <div class="site-description" itemprop="description">日常记录</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WangRuilin</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
