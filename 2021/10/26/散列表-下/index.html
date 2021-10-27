@@ -20,19 +20,21 @@
     var CONFIG = {"hostname":"linlan.top","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="接着学散列表（下）。">
+  <meta name="description" content="接着学散列表（下）。这一节主要介绍散列表和链表是如何组合起来使用的，以及为什么散列表和链表会经常放到一块使用。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="散列表(下)">
 <meta property="og:url" content="https://linlan.top/2021/10/26/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%8B/index.html">
 <meta property="og:site_name" content="Violin&#39;s Blog">
-<meta property="og:description" content="接着学散列表（下）。">
+<meta property="og:description" content="接着学散列表（下）。这一节主要介绍散列表和链表是如何组合起来使用的，以及为什么散列表和链表会经常放到一块使用。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://linlan.top/2021/10/26/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%8B/lru.webp">
 <meta property="article:published_time" content="2021-10-25T16:00:00.000Z">
 <meta property="article:modified_time" content="2021-10-25T16:00:00.000Z">
 <meta property="article:author" content="WangRuilin">
 <meta property="article:tag" content="极客时间">
 <meta property="article:tag" content="散列表">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://linlan.top/2021/10/26/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%8B/lru.webp">
 
 <link rel="canonical" href="https://linlan.top/2021/10/26/%E6%95%A3%E5%88%97%E8%A1%A8-%E4%B8%8B/">
 
@@ -236,14 +238,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>10</span>
+              <span>3.2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>8 分钟</span>
             </span>
 
         </div>
@@ -255,8 +257,60 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>接着学散列表（下）。</p>
+        <p>接着学散列表（下）。这一节主要介绍散列表和链表是如何组合起来使用的，以及为什么散列表和链表会经常放到一块使用。</p>
 <span id="more"></span>
+<h2 id="lru缓存淘汰算法">LRU缓存淘汰算法</h2>
+<p>回顾如何通过链表实现<code>LRU</code>缓存淘汰算法。首先需要维护一个按照访问时间从大到小有序排列的链表结构。因为缓存大小有限，当缓存空间不够时，需要淘汰一个数据的时候，就直接将链表头部的结点删除（这里按照访问时间从大到小的意思是：头结点是最早访问的，尾结点是最新访问的）。当要缓存某个数据时，先在链表中查找这个数据。如果没有找到，则直接将数据放到链表的尾部；如果找到了，就把它移动到链表的尾部。因为查找数据需要遍历链表，所以单纯用链表实现的<code>LRU</code>缓存淘汰算法的时间复杂度是<span class="math inline">\(O(n)\)</span>。</p>
+<p>实际上，一个缓存系统主要包含这几个操作：</p>
+<ul>
+<li>往缓存里添加一个数据</li>
+<li>从缓存里删除一个数据</li>
+<li>在缓存里查找一个数据</li>
+</ul>
+<p>如果将散列表和链表两种数据结构组合使用，可以将时间复杂度都降低到<span class="math inline">\(O(1)\)</span>。</p>
+<p><img src="lru.webp" /></p>
+<p>这张图通过网友评论，理解了半天，先放原评论，<code>目前第一排第一个是头结点，第一排第二个是尾结点。当要删除结点时，按序从头删即可，当尾结点要添加新节点，或者将已有结点移动到尾结点，只要计算出该节点的散列值，然后放到对应散列行的最后，并和上一个尾结点（即目前的第一排第二个）进行双向连接即可</code>，自己一开始不能理解的是，为什么双向链表是这样连接起来的？其实应该是这样的，（不考虑删除元素，只考虑添加元素）第一次通过散列函数计算添加了第一槽里的第一个元素，然后第二次通过散列函数计算添加了第二槽里第一个元素，第三次通过散列函数计算发现和第二槽里的元素，发生了散列冲突，通过双向链表将两个元素连接起来，依次类推理解。另一位网友评论总结实在是太好了，<code>1)双向链表中的prev和next指针是示意图中的纵向指针，hnext是横向指针。2)hnext维护的是散列表中同一槽位的单链表（即连接hash值相同的结点）3)一个散列表搭档一个双向链表。散列表中同一槽位的结点通过hnext指针连接，也就是同意槽位上的单链表。</code><strong>双向链表维护的是时间线，节点的淘汰和增加就在双向链表中进行。</strong>散列表和链表两种数据结构组合使用既解决了链表查询时间复杂度高的问题，又不需要像数组在空间不足时需要动态扩容。</p>
+<h3 id="时间复杂度">时间复杂度</h3>
+<p>查找数据。散列表中查找数据的时间复杂度为<span class="math inline">\(O(1)\)</span>（如果装载因子比较大的时候，发生散列冲突。如果链表结点个数少于8时，时间复杂度为<span class="math inline">\(O(1)\)</span>，否则时间复杂度可能为<span class="math inline">\(O(logn)\)</span>）。当找到数据之后，需要把它移动到双向链表的尾部（移动到双向链表的尾部之后，结点在哈希表中的位置并不会改变。<code>hnext</code>指针没有改变，只改变<code>next</code>指针）。</p>
+<p>删除数据。首先找到数据所在的结点，然后将结点删除。借住散列表，可以在<span class="math inline">\(O(1)\)</span>时间复杂度里找到要删除的结点。同时，双向链表可以通过前驱指针<span class="math inline">\(O(1)\)</span>时间复杂度获取前驱结点，所以在双向链表中，删除结点只需要<span class="math inline">\(O(1)\)</span>的时间复杂度（这里应该还需要删除拉链中的结点，时间复杂度应该也考虑到）。</p>
+<p>添加数据。首先查看这个数据是否已经在缓存中。如果在，需要将其移动到双向链表的尾部；如果不在其中，还要看缓存有没有满。如果满了，则将双向链表头部的结点删除，然后再将数据放到链表的尾部；如果没有满，就直接将数据放到链表的尾部。整个过程涉及的查找操作都可以通过散列表来完成。其他的操作，比如删除头结点，链表尾部插入数据等，都可以在<span class="math inline">\(O(1)\)</span>时间复杂度内完成。</p>
+<p>所以，这三个操作的时间复杂度都是<span class="math inline">\(O(1)\)</span>。</p>
+<h2 id="redis-有序集合">Redis 有序集合</h2>
+<p>在有序集合中，每个成员对象有两个重要的属性，<strong>key</strong>（键值）和<strong>score</strong>（分值）。不仅会通过<code>score</code>来查找数据，还会通过<code>key</code>来查找数据。</p>
+<p>举例说明，比如用户积分榜有这样一个功能：可以通过用户的<code>ID</code>来查找积分信息，也可以通过积分区间来查找用户<code>ID</code>或者姓名信息。这里包含<code>ID</code>、姓名和积分的用户信息，就是成员对象，用户<code>ID</code>就是<code>key</code>，积分就是<code>score</code>。</p>
+<p>细化一下<code>Redis</code>有序集合的操作：</p>
+<ul>
+<li>添加一个成员对象</li>
+<li>按照键值来删除一个成员对象</li>
+<li>按照键值来查找一个成员对象</li>
+<li>按照分值区间查找数据，比如查找积分在<code>[100, 356]</code>之间的成员对象</li>
+<li>按照分值从小到大排序成员变量</li>
+</ul>
+<p>如果仅仅按照<strong>分值</strong>将成员对象组织成跳表（要求有序）的结构，那按照键值来删除、查询成员对象就会很慢，解决方法与<code>LRU</code>缓存淘汰算法的解决方法类似。可以按照键值构建一个散列表，这样按照<code>key</code>来删除、查找一个成员对象的时间复杂度就变成了<span class="math inline">\(O(1)\)</span>。</p>
+<h2 id="java-linkedhashmap">Java LinkedHashMap</h2>
+<p><code>LinkedHashMap</code>也是通过散列表和链表组合在一起的。</p>
+<p>它支持按照插入顺序遍历数据，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HashMap&lt;Integer, Integer&gt; m = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line">m.put(<span class="number">3</span>, <span class="number">11</span>);</span><br><span class="line">m.put(<span class="number">1</span>, <span class="number">12</span>);</span><br><span class="line">m.put(<span class="number">5</span>, <span class="number">23</span>);</span><br><span class="line">m.put(<span class="number">2</span>, <span class="number">22</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (Map.Entry e : m.entrySet()) &#123;</span><br><span class="line">  	System.out.println(e.getKey());  <span class="comment">// 3, 1, 5, 2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还支持按照访问顺序来遍历数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 10是初始大小，0.75是装载因子，true是表示按照访问时间排序</span></span><br><span class="line">HashMap&lt;Integer, Integer&gt; m = <span class="keyword">new</span> LinkedHashMap&lt;&gt;(<span class="number">10</span>, <span class="number">0.75f</span>, <span class="keyword">true</span>);</span><br><span class="line">m.put(<span class="number">3</span>, <span class="number">11</span>);</span><br><span class="line">m.put(<span class="number">1</span>, <span class="number">12</span>);</span><br><span class="line">m.put(<span class="number">5</span>, <span class="number">23</span>);</span><br><span class="line">m.put(<span class="number">2</span>, <span class="number">22</span>);</span><br><span class="line"></span><br><span class="line">m.put(<span class="number">3</span>, <span class="number">26</span>);</span><br><span class="line">m.get(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (Map.Entry e : m.entrySet()) &#123;</span><br><span class="line">  	System.out.println(e.getKey());  <span class="comment">// 1, 2, 3, 5</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实按照访问时间排序的<code>LinkedHashMap</code>本身就是一个支持<code>LRU</code>缓存淘汰策略的缓存系统。</p>
+<p><code>LinkedHashMap</code>是通过双向链表和散列表这两种数据结构组合实现的。<code>LinkedHashMap</code>中的“<code>Linked</code>”实际上指的是双向链表，并非只用链表法解决散列冲突。</p>
+<h2 id="解答开篇">解答开篇</h2>
+<p>为什么散列表和链表经常一块使用？</p>
+<p>散列表这种数据结构虽然支持非常高效的数据插入、删除、查找操作，但是散列表中的数据都是通过散列函数打乱之后无规律存储的。也就是说，它无法支持按照某种顺序快速地遍历数据。如果希望按照顺序遍历散列表中的数据，那需要将散列表中的数据拷贝到数据中，然后排序，再遍历。</p>
+<p>因为散列表是动态数据结构，不停地有数据的插入、删除，所以每当希望按照顺序遍历散列表中的数据的时候，都需要先排序，那效率势必会很低。为了解决这个问题，将散列表和链表（或者跳表）结合在一起使用。</p>
+<h2 id="课后思考">课后思考</h2>
+<ol type="1">
+<li><p>如果把例子中的双向链表改成单链表，还能否正常工作呢？</p>
+<p>删除一个元素时，虽然能<span class="math inline">\(O(1)\)</span>时间复杂度找到目标结点，但是要删除该结点需要拿到前一个结点的指针，遍历到前一个结点时间复杂度会变成<span class="math inline">\(O(n)\)</span>，所以使用双向链表实现比较合适。</p></li>
+<li><p>假设猎聘网有10万名猎头，每个猎头都可以通过做任务（比如发布职位）来积累积分，然后通过积分来下载简历。那么问题是如果在内存里存储这10万个猎头的<code>ID</code>和积分信息，让它能够支持这样几个操作：</p>
+<ul>
+<li>根据猎头的<code>ID</code>快速查找、删除、更新这个猎头的积分信息</li>
+<li>查找积分在某个区间的猎头<code>ID</code>列表</li>
+<li>查找按照积分从小到大排名在第<code>x</code>位到第<code>y</code>位之间的猎头<code>ID</code>列表</li>
+</ul>
+<p>这个问题跟<code>Redis</code>有序集合中举的例子很像。1）ID在散列表中所以可以<span class="math inline">\(O(1)\)</span>查找。2）积分以跳表存储，跳表支持区间查询。3）这点根据目前的学习暂时无法实现。</p></li>
+</ol>
 
     </div>
 
@@ -353,6 +407,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#lru%E7%BC%93%E5%AD%98%E6%B7%98%E6%B1%B0%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">LRU缓存淘汰算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">1.1.</span> <span class="nav-text">时间复杂度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#redis-%E6%9C%89%E5%BA%8F%E9%9B%86%E5%90%88"><span class="nav-number">2.</span> <span class="nav-text">Redis 有序集合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#java-linkedhashmap"><span class="nav-number">3.</span> <span class="nav-text">Java LinkedHashMap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E7%AD%94%E5%BC%80%E7%AF%87"><span class="nav-number">4.</span> <span class="nav-text">解答开篇</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E5%90%8E%E6%80%9D%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">课后思考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
