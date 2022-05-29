@@ -156,6 +156,140 @@ S_n = \frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{1*\frac{1}{2}-\frac{n}{
       </tags>
   </entry>
   <entry>
+    <title>刷机记录</title>
+    <url>/2022/04/15/%E5%88%B7%E6%9C%BA%E8%AE%B0%E5%BD%95/</url>
+    <content><![CDATA[<p>本文主要记录Nexus 5、Pixel XL以及Redmi Note 9 (4G)的刷机过程。</p>
+<span id="more"></span>
+<h2 id="nexus-5">Nexus 5</h2>
+<h3 id="准备">准备</h3>
+<ol type="1">
+<li>下载Nexus 5系统镜像。地址：<code>https://developers.google.com/android/images#hammerhead</code></li>
+<li>下载Twrp刷机工具。下载地址：<code>https://twrp.me/lg/lgnexus5.html</code></li>
+<li>下载Magisk。地址：<code>https://github.com/topjohnwu/Magisk/releases</code></li>
+<li>下载Xposed。地址：<code>https://dl-xda.xposed.info/framework/</code>。</li>
+</ol>
+<h3 id="刷机">刷机</h3>
+<ol type="1">
+<li><p>执行<code>adb reboot bootloader</code>， 重启手机至<code>bootloader</code>。</p></li>
+<li><p>如果直接执行系统镜像中的<code>./flash-all.sh</code>，手机会无限重启。出现此问题，建议手动清除各个分区，并且手动刷各个分区image。自己写一个shell脚本，命名为<code>./flash-all-new.sh</code>，并执行。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">fastboot erase cache</span><br><span class="line">fastboot erase userdata</span><br><span class="line">fastboot erase boot</span><br><span class="line">fastboot erase cache</span><br><span class="line">fastboot erase recovery</span><br><span class="line">fastboot erase system</span><br><span class="line"></span><br><span class="line">fastboot flash bootloader bootloader-hammerhead-hhz20h.img</span><br><span class="line">fastboot reboot-bootloader</span><br><span class="line">sleep 5</span><br><span class="line"></span><br><span class="line">fastboot flash radio radio-hammerhead-m8974a-2.0.50.2.30.img</span><br><span class="line">fastboot reboot-bootloader</span><br><span class="line">sleep 5</span><br><span class="line"></span><br><span class="line">fastboot flash recovery recovery.img</span><br><span class="line">fastboot flash boot boot.img</span><br><span class="line">fastboot flash system system.img</span><br><span class="line">fastboot flash cache cache.img</span><br><span class="line">fastboot flash userdata userdata.img</span><br><span class="line">sleep 5</span><br><span class="line"></span><br><span class="line">fastboot reboot</span><br></pre></td></tr></table></figure></li>
+<li><p>等待手机重启，刷机至此完成。</p></li>
+<li><p>打开开发者模式以及开启USB调试</p></li>
+</ol>
+<h3 id="刷recovery">刷recovery</h3>
+<ol type="1">
+<li>执行<code>adb reboot bootloader</code>，重启手机至<code>bootloader</code>。</li>
+<li>执行<code>fastboot flash recovery twrp-3.4.0-0-hammerhead.img</code>。</li>
+<li>按上下音量键，选择<code>recovery</code>。按电源键确认。</li>
+</ol>
+<h3 id="刷magisk">刷magisk</h3>
+<ol type="1">
+<li><code>adb push Magisk-v23.0.zip /sdcard/</code></li>
+<li><code>reboot system</code></li>
+</ol>
+<h3 id="刷xposed">刷Xposed</h3>
+<ol type="1">
+<li><code>adb push xposed-v89-sdk23-arm.zip /sdcard/</code></li>
+<li><code>reboot system</code></li>
+</ol>
+<h2 id="pixel-xl">Pixel XL</h2>
+<p>待补充</p>
+<h2 id="redmi-note-94g">Redmi Note 9(4G)</h2>
+<h3 id="准备-1">准备</h3>
+<ol type="1">
+<li>下载并解压<code>Fastboot</code>线刷包。下载地址：<code>https://xiaomirom.com/rom/redmi-note-9-5g-cannon-china-fastboot-recovery-rom/</code></li>
+<li>下载并安装<code>MiFlash</code>刷机工具。注意，MiFlash仅支持Windows平台。相关介绍及下载地址：<code>https://xiaomirom.com/download-xiaomi-flash-tool-miflash/</code></li>
+</ol>
+<h3 id="刷机-1">刷机</h3>
+<ol type="1">
+<li>点击MiFlash右侧-&gt;加载设备。</li>
+<li>点击MiFlash左侧-&gt;选择，选择准备1中解压好的系统镜像路径。</li>
+<li>点击MiFlash右侧-&gt;刷机。静静等待几分钟，系统启动。</li>
+<li>打开开发者模式。设置-&gt;我的设备-&gt;全部参数-&gt;MIUI版本，连续点击数次。</li>
+<li>打开USB调试。设置-&gt;更多设置-&gt;开发者选项，打开USB调试。</li>
+</ol>
+<p>注意：</p>
+<ol type="1">
+<li>不建议在fastboot模式下直接执行<code>./flash_all.sh</code>。</li>
+<li>建议执行<code>./flash_all_lock.bat</code>。亲测<code>./flash_all.bat</code>会报错，执行失败。</li>
+</ol>
+<h3 id="踩过的坑">踩过的坑</h3>
+<ol type="1">
+<li><code>Twrp</code>并没有支持<code>Redmi Note 9</code>，找了好久，其实用<code>MiFlash</code>就好了，简单方便。</li>
+</ol>
+<p>参考链接：</p>
+<ol type="1">
+<li><a href="https://www.jianshu.com/p/c14f003fa844">Nexus 5刷机无限重启的解决方案</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>安卓逆向</category>
+      </categories>
+      <tags>
+        <tag>LG Nexus 5</tag>
+        <tag>Redmi Note 9 4G</tag>
+        <tag>Google Pixel XL</tag>
+        <tag>刷机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>原码、反码和补码</title>
+    <url>/2022/04/08/%E5%8E%9F%E7%A0%81%E3%80%81%E5%8F%8D%E7%A0%81%E5%92%8C%E8%A1%A5%E7%A0%81/</url>
+    <content><![CDATA[<p>本篇文章主要学习记录原码、反码以及补码的相关知识。</p>
+<span id="more"></span>
+<h2 id="原码">原码</h2>
+<p>计算机为了表示负数，在二进制数值前面增加一位符号位（即最高位为符号位）：正数该位为0，负数该位为1，其余位表示数值的大小。</p>
+<p>比如，10的二进制原码表示为<code>0 1010</code>，-10的二进制原码表示为<code>1 1010</code>。</p>
+<p>这种编码方式被称之为原码，<strong>原码的优点比较明显，就是简单直观，容易被人理解</strong>。</p>
+<h3 id="存在的问题">存在的问题</h3>
+<p>当正数+正数时，比如5+2，即<code>0 0101 + 0 0010 = 0 0111</code>，原码<code>0 0111</code>表示十进制中的7，即5+2=7。此时没有任何问题。</p>
+<p>当正数+负数时，比如5+(-2)，即<code>0 0101 + 1 0010 = 1 0111</code>，原码<code>1 0111</code>表示十进制中的-7，即5+(-2)=-7，显然是不正确的。</p>
+<p>原码这种编码方式仅支持正数+正数（即加法操作），而对于正数+负数（即减法操作）这种情况，显然不支持。</p>
+<h2 id="反码">反码</h2>
+<p>反码是基于原码计算得来，表示方式是：正数的反码是其本身。负数的反码是在其原码的基础上，符号位不变，其余各个位取反。</p>
+<p>举例说明，10的二进制反码表示为<code>0 1010</code>，-10的二进制反码表示为<code>1 0101</code>。</p>
+<p>反码计算的规则：</p>
+<ol type="1">
+<li>反码运算时，其符号位与数值一起参加运算。</li>
+<li><strong>反码的符号位相加后，如果有进位出现，则要把它送回最低位去相加（循环进位）。</strong></li>
+<li>用反码运算，其运算结果亦为反码。在转换为真值时，若符号位为0，数位不变；若符号位为1，应将结果各个位取反才是其真值。</li>
+</ol>
+<p>比如5+(-2)，反码表示为<code>0 0101 + 1 1101 = 0 0011</code>，即5+(-2)=3。</p>
+<p>再看一个(-5)+2，反码表示为<code>1 1010 + 0 0010 = 1 1100</code>，反码<code>1 1100</code>对应原码<code>1 0011</code>，其结果为-3。</p>
+<h3 id="存在的问题-1">存在的问题</h3>
+<p>当5+(-5)时，即<code>0 0101 + 1 1010 = 1 1111</code>，反码<code>1 1111</code>对应原码<code>1 0000</code>，其真值为-0。尽管+0和-0是一样的，但是0带符号是没有意义的。</p>
+<p>反码虽然解决了减法的问题，但是却没有解决0的符号问题。</p>
+<h2 id="补码">补码</h2>
+<p>补码是在原码和反码的基础上衍生出来的，补码的表示方法是：正数的补码就是其本身。负数的补码是在其原码的基础上，符号位不变，其余各位取反，最后+1（即在反码的基础上+1）。</p>
+<p>补码计算的规则：</p>
+<ol type="1">
+<li>补码运算时，其符号位与数值一起参加运算。</li>
+<li><strong>补码的符号位相加后，如果有进位出现，则进位被舍弃。</strong></li>
+<li>用补码运算，其运算结果亦为补码。在转换成原码时，如果是正数，其补码就是原码；如果是负数，该补码的补码就是其原码。</li>
+</ol>
+<p>先来看一下5+(-5)，即<code>0 0101 +  1 1011 =  0 0000</code>。补码<code>0 0000</code>对应十进制为0。没有问题。</p>
+<p>再来看一下5+(-6)，即<code>0 0101 + 1 1010 = 1 1111</code>。补码<code>1 1111</code>对应原码<code>1 0001</code>，即5+(-6)=-1。也没有问题。</p>
+<p>有了补码，0的表达方式就唯一了，如果是8位的话，那么就是固定的<code>0000 0000</code>。同时，补码的取值范围也从原码和反码的<code>[-127, 127]</code>（即<code>[11111111, 01111111]</code>变成了<code>[-128, 127]</code>，其中补码<code>1000 0000</code>来表示-128。</p>
+<h2 id="总结">总结</h2>
+<ol type="1">
+<li><p>正数的反码是其本身，负数的反码是在原码的基础上，除符号位外，其余位取反。</p></li>
+<li><p>正数的补码是其本身，负数的补码是在原码的基础上，除符号位外，其余位取反，然后+1（即在反码的基础上+1）。</p></li>
+<li><p>负数的补码的补码是其原码。</p></li>
+</ol>
+<p>参考文章：</p>
+<ol type="1">
+<li><a href="https://mp.weixin.qq.com/s/WSAZlbuDbyriXwB6LGA4uw">漫话：为什么计算机用补码存储数据？</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>计算机组成原理</category>
+      </categories>
+      <tags>
+        <tag>计算机基础</tag>
+        <tag>编码</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>哈希算法(上)</title>
     <url>/2021/11/05/%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95-%E4%B8%8A/</url>
     <content><![CDATA[<p>今天来学一下哈希算法（上）。本篇文章的主要内容是如何用哈希算法解决问题。</p>
@@ -242,63 +376,6 @@ S_n = \frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{1*\frac{1}{2}-\frac{n}{
       <tags>
         <tag>极客时间</tag>
         <tag>哈希算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>原码、反码和补码</title>
-    <url>/2022/04/08/%E5%8E%9F%E7%A0%81%E3%80%81%E5%8F%8D%E7%A0%81%E5%92%8C%E8%A1%A5%E7%A0%81/</url>
-    <content><![CDATA[<p>本篇文章主要学习记录原码、反码以及补码的相关知识。</p>
-<span id="more"></span>
-<h2 id="原码">原码</h2>
-<p>计算机为了表示负数，在二进制数值前面增加一位符号位（即最高位为符号位）：正数该位为0，负数该位为1，其余位表示数值的大小。</p>
-<p>比如，10的二进制原码表示为<code>0 1010</code>，-10的二进制原码表示为<code>1 1010</code>。</p>
-<p>这种编码方式被称之为原码，<strong>原码的优点比较明显，就是简单直观，容易被人理解</strong>。</p>
-<h3 id="存在的问题">存在的问题</h3>
-<p>当正数+正数时，比如5+2，即<code>0 0101 + 0 0010 = 0 0111</code>，原码<code>0 0111</code>表示十进制中的7，即5+2=7。此时没有任何问题。</p>
-<p>当正数+负数时，比如5+(-2)，即<code>0 0101 + 1 0010 = 1 0111</code>，原码<code>1 0111</code>表示十进制中的-7，即5+(-2)=-7，显然是不正确的。</p>
-<p>原码这种编码方式仅支持正数+正数（即加法操作），而对于正数+负数（即减法操作）这种情况，显然不支持。</p>
-<h2 id="反码">反码</h2>
-<p>反码是基于原码计算得来，表示方式是：正数的反码是其本身。负数的反码是在其原码的基础上，符号位不变，其余各个位取反。</p>
-<p>举例说明，10的二进制反码表示为<code>0 1010</code>，-10的二进制反码表示为<code>1 0101</code>。</p>
-<p>反码计算的规则：</p>
-<ol type="1">
-<li>反码运算时，其符号位与数值一起参加运算。</li>
-<li><strong>反码的符号位相加后，如果有进位出现，则要把它送回最低位去相加（循环进位）。</strong></li>
-<li>用反码运算，其运算结果亦为反码。在转换为真值时，若符号位为0，数位不变；若符号位为1，应将结果各个位取反才是其真值。</li>
-</ol>
-<p>比如5+(-2)，反码表示为<code>0 0101 + 1 1101 = 0 0011</code>，即5+(-2)=3。</p>
-<p>再看一个(-5)+2，反码表示为<code>1 1010 + 0 0010 = 1 1100</code>，反码<code>1 1100</code>对应原码<code>1 0011</code>，其结果为-3。</p>
-<h3 id="存在的问题-1">存在的问题</h3>
-<p>当5+(-5)时，即<code>0 0101 + 1 1010 = 1 1111</code>，反码<code>1 1111</code>对应原码<code>1 0000</code>，其真值为-0。尽管+0和-0是一样的，但是0带符号是没有意义的。</p>
-<p>反码虽然解决了减法的问题，但是却没有解决0的符号问题。</p>
-<h2 id="补码">补码</h2>
-<p>补码是在原码和反码的基础上衍生出来的，补码的表示方法是：正数的补码就是其本身。负数的补码是在其原码的基础上，符号位不变，其余各位取反，最后+1（即在反码的基础上+1）。</p>
-<p>补码计算的规则：</p>
-<ol type="1">
-<li>补码运算时，其符号位与数值一起参加运算。</li>
-<li><strong>补码的符号位相加后，如果有进位出现，则进位被舍弃。</strong></li>
-<li>用补码运算，其运算结果亦为补码。在转换成原码时，如果是正数，其补码就是原码；如果是负数，该补码的补码就是其原码。</li>
-</ol>
-<p>先来看一下5+(-5)，即<code>0 0101 +  1 1011 =  0 0000</code>。补码<code>0 0000</code>对应十进制为0。没有问题。</p>
-<p>再来看一下5+(-6)，即<code>0 0101 + 1 1010 = 1 1111</code>。补码<code>1 1111</code>对应原码<code>1 0001</code>，即5+(-6)=-1。也没有问题。</p>
-<p>有了补码，0的表达方式就唯一了，如果是8位的话，那么就是固定的<code>0000 0000</code>。同时，补码的取值范围也从原码和反码的<code>[-127, 127]</code>（即<code>[11111111, 01111111]</code>变成了<code>[-128, 127]</code>，其中补码<code>1000 0000</code>来表示-128。</p>
-<h2 id="总结">总结</h2>
-<ol type="1">
-<li><p>正数的反码是其本身，负数的反码是在原码的基础上，除符号位外，其余位取反。</p></li>
-<li><p>正数的补码是其本身，负数的补码是在原码的基础上，除符号位外，其余位取反，然后+1（即在反码的基础上+1）。</p></li>
-<li><p>负数的补码的补码是其原码。</p></li>
-</ol>
-<p>参考文章：</p>
-<ol type="1">
-<li><a href="https://mp.weixin.qq.com/s/WSAZlbuDbyriXwB6LGA4uw">漫话：为什么计算机用补码存储数据？</a></li>
-</ol>
-]]></content>
-      <categories>
-        <category>计算机组成原理</category>
-      </categories>
-      <tags>
-        <tag>计算机基础</tag>
-        <tag>编码</tag>
       </tags>
   </entry>
   <entry>
