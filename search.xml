@@ -1237,6 +1237,78 @@ S_n = \frac{(1*\frac{1}{2}-n)}{\frac{1}{2}-1}=\frac{1-2n}{1-2}=2n-1
       </tags>
   </entry>
   <entry>
+    <title>记录IDA动态调试APP</title>
+    <url>/2022/05/13/%E8%AE%B0%E5%BD%95IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95APP/</url>
+    <content><![CDATA[<p>本文主要记录如何通过IDA动态调试SO层存在反调试的APK。</p>
+<span id="more"></span>
+<h2 id="前言">前言</h2>
+<p>最近在实践文章<a href="https://bbs.pediy.com/thread-272141-1.htm">[原创]分析一个安卓简单CrackMe</a>的过程中，当IDA<code>Debugger-&gt;attach</code>进程后，APP就崩溃退出了。后来作者回复说是因为<code>JNI_OnLoad</code>中存在反调试。</p>
+<p>自己查阅了相关资料，其中定位反调试位置主要参考<a href="https://bbs.pediy.com/thread-272452.htm">[原创]Android APP漏洞之战（10）——调试与反调试详解</a>中的so层过反调。</p>
+<p>本机环境：MacOS Catalina、IDA Pro 7.0、pixel xl android 8.1.0</p>
+<h2 id="定位反调试">定位反调试</h2>
+<ol type="1">
+<li><p>启动<code>android_server</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb push android_server /data/local/tmp/android_server</span><br><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">cd /data/local/tmp</span><br><span class="line">mv android_server as</span><br><span class="line">chmod +x as</span><br><span class="line">./as -p12344</span><br></pre></td></tr></table></figure></li>
+<li><p>端口转发</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb forward tcp:12344 tcp:12344</span><br></pre></td></tr></table></figure></li>
+<li><p>挂起程序，此时处于<code>Waiting for Debugger</code>状态</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adb shell am start -D -n com.yaotong.crackme/.MainActivity</span><br></pre></td></tr></table></figure></li>
+<li><p>通过Android sdk工具<code>Android Device Monitor</code>查看端口</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd ~/Library/Android/sdk/tools/</span><br><span class="line">./monitor</span><br></pre></td></tr></table></figure></li>
+<li><p>打开IDA，点击菜单栏<code>Debugger-&gt;attach-&gt;Remote ARMLinux/Android debugger</code>。<code>Hostname</code>填写<code>localhost</code>代表本机，<code>Port</code>填写12344。点击<code>Debug options</code>，勾选<code>Suspend on process entry point</code>、<code>Suspend on thread start/exit</code>、<code>Suspend on library load/unload</code>三项，点击OK。<code>attach</code>进程<code>com.yaotong.crackme</code>，点击OK。点击菜单栏<code>Debugger-Debugger options</code>，再次确认勾选<code>Suspend on process entry point</code>、<code>Suspend on thread start/exit</code>、<code>Suspend on library load/unload</code>。不然后续调试会出现异常退出的情况。</p></li>
+<li><p><code>jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8602</code>，其中端口为步骤4的端口。</p></li>
+<li><p>按F9调试，同时查看<code>Output indow</code>中目标SO<code>libcrackme.so</code>是否加载。当目标SO加载后，在<code>Path</code>窗口搜索<code>JNI_OnLoad</code>函数，下断点，进行单步调试。定位具体反调试位置。以下来自文章<a href="https://bbs.pediy.com/thread-272452.htm">[原创]Android APP漏洞之战（10）——调试与反调试详解</a>：<code>下面使用F8开始单步调试了，发现每次到达BLX R7这条指令执行完之后，JNI_OnLoad函数就退出了，这个地方存在问题，可能就是反调试的地方了。我们再次进入调试，看见BLX跳转的地方R7寄存器中是pthread_create函数，到了这里我们就找到了出问题的地方，接下来我们只需要修改对应的位置就可以了。可以把BLX R7这条指令给nop掉，也就是把这条指令变成空指令(相当于删除这条指令)这样apk就不会新建线程去执行检测代码了。</code></p></li>
+</ol>
+<h2 id="patch-program">Patch program</h2>
+<p>定位到反调试的位置后，有两种方式可以nop掉指令。</p>
+<ol type="1">
+<li><code>Hex View</code>视图右键<code>Edit</code>修改成<code>00 00 00 00</code>，然后再右键选择<code>Apply changes</code>。</li>
+<li>菜单栏<code>Edit-&gt;Patch program-&gt;Patch Bytes</code>，然后同目录再选择<code>Apply patchs to input file</code>保存更改。</li>
+</ol>
+<p>这样就过掉一个简单的反调试了。</p>
+<h2 id="回编译">回编译</h2>
+<p>主要使用工具<code>apktool</code>，官网：<code>https://ibotpeaches.github.io/Apktool/</code></p>
+<ol type="1">
+<li><p>反编译</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">apktool d com.yaotong.crackme.apk -o com.yaotong.crackme</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>将上一步patch掉反调试的SO放到<code>com.yaotong.crackme/lib</code>目录下再进行回编译。</p>
+<ol start="2" type="1">
+<li><p>回编译</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">apktool b com.yaotong.crackme -o com.yaotong.crackme_unsigned.apk</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="签名">签名</h2>
+<p>要想把上一步回编译好的apk安装到手机上，还需要一步：签名。</p>
+<ol type="1">
+<li><p>生成<code>keystore</code>证书</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">keytool -genkey -v -keystore myApp.keystore -alias myApp.keystore -keyalg RSA -validity 3000</span><br></pre></td></tr></table></figure></li>
+<li><p>签名</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">jarsigner -verbose -keystore myApp.keystore -signedjar com.yaotong.crackme_signed.apk com.yaotong.crackme_unsigned.apk  myApp.keystore</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>具体参数选项含义可以通过<code>keytool -genkey -h</code>、<code>jarsigner -h</code>来查看。</p>
+<p>经过patch掉反调试以及重新签名的apk就可以愉快地进行IDA动态调试了。</p>
+<h2 id="其它知识">其它知识</h2>
+<h3 id="反调试检测">反调试检测</h3>
+<p>现在很多应用防止别的进程调试或者注入，通常会自我检测。原理就是：<strong>循环检测/proc/[mypid]/status文件，查看TracerPid是否为0，如果不为0，表示被其它进程trace了。</strong>那么这时候就直接退出程序。因为现在的IDA调试时需要进程的注入。进程注入现在都是使用Linux中的ptrace机制。那么这里的TracerPid就可以记录trace的pid，就可以发现程序被哪个进程注入了。或者是被它调试，进而采取一些措施。</p>
+<h3 id="ida调试的整体原理">IDA调试的整体原理</h3>
+<p>首先需要在被调试端放一个程序，用于IDA端和调试设备通信，这个程序就是<code>android_server</code>。因为要附加进程，所以这个程序必须要用root身份运行。这个程序起来之后，会开一个端口23946(默认端口)。使用adb forward进行端口转发到远程调试端，这时候IDA就可以和调试端的<code>android_server</code>进行通信了。后面获取设备的进程列表、附加进程、传递调试信息，都可以使用这个通信机制完成。IDA可以获取被调试进程的内存数据，一般是在<code>/proc/[pid]/maps</code>文件中，所以在使用<code>ctrl+s</code>可以查看所有SO文件的基地址，可以遍历maps文件即可做到。</p>
+<p>参考文章：</p>
+<ol type="1">
+<li><a href="https://bbs.pediy.com/thread-272141-1.htm">[原创]分析一个安卓简单CrackMe</a></li>
+<li><a href="https://bbs.pediy.com/thread-272452.htm">[原创]Android APP漏洞之战（10）——调试与反调试详解</a></li>
+<li><a href="https://blog.csdn.net/m0_46204016/article/details/105605620">Android逆向之旅---动态方式破解apk进阶篇(IDA调试so源码)</a></li>
+<li><a href="https://blog.51cto.com/u_15322220/3286592">Android APK生成证书并签名方法</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>安卓逆向</category>
+      </categories>
+      <tags>
+        <tag>安卓逆向</tag>
+        <tag>IDA动态调试</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>跳表</title>
     <url>/2021/10/24/%E8%B7%B3%E8%A1%A8/</url>
     <content><![CDATA[<p>今天来学习跳表。</p>

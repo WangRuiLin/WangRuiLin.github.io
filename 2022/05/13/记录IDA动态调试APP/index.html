@@ -27,17 +27,12 @@
 <meta property="og:site_name" content="Violin&#39;s Blog">
 <meta property="og:description" content="本文主要记录如何通过IDA动态调试SO层存在反调试的APK。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://linlan.top/2022/05/13/%E8%AE%B0%E5%BD%95IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95APP/run_android_server.png">
-<meta property="og:image" content="https://linlan.top/2022/05/13/%E8%AE%B0%E5%BD%95IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95APP/monitor.png">
-<meta property="og:image" content="https://linlan.top/2022/05/13/%E8%AE%B0%E5%BD%95IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95APP/debug_application.png">
-<meta property="og:image" content="https://linlan.top/2022/05/13/%E8%AE%B0%E5%BD%95IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95APP/debugger_setup.png">
 <meta property="article:published_time" content="2022-05-12T16:00:00.000Z">
-<meta property="article:modified_time" content="2022-05-29T08:18:29.584Z">
+<meta property="article:modified_time" content="2022-05-12T16:00:00.000Z">
 <meta property="article:author" content="WangRuilin">
 <meta property="article:tag" content="安卓逆向">
 <meta property="article:tag" content="IDA动态调试">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://linlan.top/2022/05/13/%E8%AE%B0%E5%BD%95IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95APP/run_android_server.png">
 
 <link rel="canonical" href="https://linlan.top/2022/05/13/%E8%AE%B0%E5%BD%95IDA%E5%8A%A8%E6%80%81%E8%B0%83%E8%AF%95APP/">
 
@@ -52,7 +47,7 @@
   };
 </script>
 
-  <title>记录IDA动态调试APP | Violin's Blog</title><meta name="robots" content="noindex">
+  <title>记录IDA动态调试APP | Violin's Blog</title>
   
 
 
@@ -234,13 +229,6 @@
 
               <time title="创建时间：2022-05-13 00:00:00" itemprop="dateCreated datePublished" datetime="2022-05-13T00:00:00+08:00">2022-05-13</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-29 16:18:29" itemprop="dateModified" datetime="2022-05-29T16:18:29+08:00">2022-05-29</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -257,14 +245,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>969</span>
+              <span>2.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>7 分钟</span>
             </span>
 
         </div>
@@ -282,30 +270,61 @@
 <p>最近在实践文章<a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-272141-1.htm">[原创]分析一个安卓简单CrackMe</a>的过程中，当IDA<code>Debugger-&gt;attach</code>进程后，APP就崩溃退出了。后来作者回复说是因为<code>JNI_OnLoad</code>中存在反调试。</p>
 <p>自己查阅了相关资料，其中定位反调试位置主要参考<a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-272452.htm">[原创]Android APP漏洞之战（10）——调试与反调试详解</a>中的so层过反调。</p>
 <p>本机环境：MacOS Catalina、IDA Pro 7.0、pixel xl android 8.1.0</p>
-<h2 id="定位反调试的位置">定位反调试的位置</h2>
+<h2 id="定位反调试">定位反调试</h2>
 <ol type="1">
-<li><p>找到应用程序<code>IDA Pro 7.0</code>文件夹下<code>ida.app-&gt;Contents-&gt;MacOS-&gt;dbgsrv-&gt;android_server</code>，并放到桌面。备注：如果是64位APP，则为<code>ida64.app</code>下面的<code>android_server</code>。</p></li>
-<li><p>将<code>android_server</code>文件放到手机路径<code>/data/local/tmp</code>。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb push android_server /data/local/tmp/android_server</span><br></pre></td></tr></table></figure></li>
-<li><p>重命名<code>android_server</code>，添加可执行权限，并运行。</p>
-<p><img src="run_android_server.png" /></p></li>
-<li><p>端口转发。其中12344是<code>android_server</code>服务运行端口，要和上一步启动时的端口保持一致。</p>
+<li><p>启动<code>android_server</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">adb push android_server /data/local/tmp/android_server</span><br><span class="line">adb shell</span><br><span class="line">su</span><br><span class="line">cd /data/local/tmp</span><br><span class="line">mv android_server as</span><br><span class="line">chmod +x as</span><br><span class="line">./as -p12344</span><br></pre></td></tr></table></figure></li>
+<li><p>端口转发</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb forward tcp:12344 tcp:12344</span><br></pre></td></tr></table></figure></li>
-<li><p>挂起程序。<code>com.yaotong.crackme</code>是应用包名。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am start -D -n com.yaotong.crackme/.MainActivity </span><br></pre></td></tr></table></figure>
-<p>手机页面显示如下。</p></li>
-<li><p>利用<code>Android Device Monitor</code>查看应用挂起端口。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ~/Library/Android/sdk/tools/</span><br><span class="line">./monitor</span><br></pre></td></tr></table></figure>
-<p><img src="monitor.png" /></p></li>
-<li><p>打开IDA，点击菜单栏<code>Debugger-&gt;attach-&gt;Remote ARMLinux/Android debugger</code>。</p>
-<p><code>Hostname</code>填写<code>localhost</code>代表本机，<code>Port</code>填写12344。</p>
-<p><img src="debug_application.png" /></p>
-<p>点击<code>Debug options</code>，勾选<code>Suspend on process entry point</code>、<code>Suspend on thread start/exit</code>、<code>Suspend on library load/unload</code>三项。</p>
-<p><img src="debugger_setup.png" /></p></li>
-<li><p>选择要附加的进程名<code>com.yaotong.crackme</code></p></li>
-<li></li>
+<li><p>挂起程序，此时处于<code>Waiting for Debugger</code>状态</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell am start -D -n com.yaotong.crackme/.MainActivity</span><br></pre></td></tr></table></figure></li>
+<li><p>通过Android sdk工具<code>Android Device Monitor</code>查看端口</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ~/Library/Android/sdk/tools/</span><br><span class="line">./monitor</span><br></pre></td></tr></table></figure></li>
+<li><p>打开IDA，点击菜单栏<code>Debugger-&gt;attach-&gt;Remote ARMLinux/Android debugger</code>。<code>Hostname</code>填写<code>localhost</code>代表本机，<code>Port</code>填写12344。点击<code>Debug options</code>，勾选<code>Suspend on process entry point</code>、<code>Suspend on thread start/exit</code>、<code>Suspend on library load/unload</code>三项，点击OK。<code>attach</code>进程<code>com.yaotong.crackme</code>，点击OK。点击菜单栏<code>Debugger-Debugger options</code>，再次确认勾选<code>Suspend on process entry point</code>、<code>Suspend on thread start/exit</code>、<code>Suspend on library load/unload</code>。不然后续调试会出现异常退出的情况。</p></li>
+<li><p><code>jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=8602</code>，其中端口为步骤4的端口。</p></li>
+<li><p>按F9调试，同时查看<code>Output indow</code>中目标SO<code>libcrackme.so</code>是否加载。当目标SO加载后，在<code>Path</code>窗口搜索<code>JNI_OnLoad</code>函数，下断点，进行单步调试。定位具体反调试位置。以下来自文章<a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-272452.htm">[原创]Android APP漏洞之战（10）——调试与反调试详解</a>：<code>下面使用F8开始单步调试了，发现每次到达BLX R7这条指令执行完之后，JNI_OnLoad函数就退出了，这个地方存在问题，可能就是反调试的地方了。我们再次进入调试，看见BLX跳转的地方R7寄存器中是pthread_create函数，到了这里我们就找到了出问题的地方，接下来我们只需要修改对应的位置就可以了。可以把BLX R7这条指令给nop掉，也就是把这条指令变成空指令(相当于删除这条指令)这样apk就不会新建线程去执行检测代码了。</code></p></li>
 </ol>
-<!-- flag of hidden posts -->
+<h2 id="patch-program">Patch program</h2>
+<p>定位到反调试的位置后，有两种方式可以nop掉指令。</p>
+<ol type="1">
+<li><code>Hex View</code>视图右键<code>Edit</code>修改成<code>00 00 00 00</code>，然后再右键选择<code>Apply changes</code>。</li>
+<li>菜单栏<code>Edit-&gt;Patch program-&gt;Patch Bytes</code>，然后同目录再选择<code>Apply patchs to input file</code>保存更改。</li>
+</ol>
+<p>这样就过掉一个简单的反调试了。</p>
+<h2 id="回编译">回编译</h2>
+<p>主要使用工具<code>apktool</code>，官网：<code>https://ibotpeaches.github.io/Apktool/</code></p>
+<ol type="1">
+<li><p>反编译</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apktool d com.yaotong.crackme.apk -o com.yaotong.crackme</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>将上一步patch掉反调试的SO放到<code>com.yaotong.crackme/lib</code>目录下再进行回编译。</p>
+<ol start="2" type="1">
+<li><p>回编译</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apktool b com.yaotong.crackme -o com.yaotong.crackme_unsigned.apk</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="签名">签名</h2>
+<p>要想把上一步回编译好的apk安装到手机上，还需要一步：签名。</p>
+<ol type="1">
+<li><p>生成<code>keystore</code>证书</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -genkey -v -keystore myApp.keystore -alias myApp.keystore -keyalg RSA -validity 3000</span><br></pre></td></tr></table></figure></li>
+<li><p>签名</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jarsigner -verbose -keystore myApp.keystore -signedjar com.yaotong.crackme_signed.apk com.yaotong.crackme_unsigned.apk  myApp.keystore</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>具体参数选项含义可以通过<code>keytool -genkey -h</code>、<code>jarsigner -h</code>来查看。</p>
+<p>经过patch掉反调试以及重新签名的apk就可以愉快地进行IDA动态调试了。</p>
+<h2 id="其它知识">其它知识</h2>
+<h3 id="反调试检测">反调试检测</h3>
+<p>现在很多应用防止别的进程调试或者注入，通常会自我检测。原理就是：<strong>循环检测/proc/[mypid]/status文件，查看TracerPid是否为0，如果不为0，表示被其它进程trace了。</strong>那么这时候就直接退出程序。因为现在的IDA调试时需要进程的注入。进程注入现在都是使用Linux中的ptrace机制。那么这里的TracerPid就可以记录trace的pid，就可以发现程序被哪个进程注入了。或者是被它调试，进而采取一些措施。</p>
+<h3 id="ida调试的整体原理">IDA调试的整体原理</h3>
+<p>首先需要在被调试端放一个程序，用于IDA端和调试设备通信，这个程序就是<code>android_server</code>。因为要附加进程，所以这个程序必须要用root身份运行。这个程序起来之后，会开一个端口23946(默认端口)。使用adb forward进行端口转发到远程调试端，这时候IDA就可以和调试端的<code>android_server</code>进行通信了。后面获取设备的进程列表、附加进程、传递调试信息，都可以使用这个通信机制完成。IDA可以获取被调试进程的内存数据，一般是在<code>/proc/[pid]/maps</code>文件中，所以在使用<code>ctrl+s</code>可以查看所有SO文件的基地址，可以遍历maps文件即可做到。</p>
+<p>参考文章：</p>
+<ol type="1">
+<li><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-272141-1.htm">[原创]分析一个安卓简单CrackMe</a></li>
+<li><a target="_blank" rel="noopener" href="https://bbs.pediy.com/thread-272452.htm">[原创]Android APP漏洞之战（10）——调试与反调试详解</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_46204016/article/details/105605620">Android逆向之旅---动态方式破解apk进阶篇(IDA调试so源码)</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.51cto.com/u_15322220/3286592">Android APK生成证书并签名方法</a></li>
+</ol>
+
     </div>
 
     
@@ -337,6 +356,13 @@
 
 
         
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/15/%E5%88%B7%E6%9C%BA%E8%AE%B0%E5%BD%95/" rel="prev" title="刷机记录">
+      <i class="fa fa-chevron-left"></i> 刷机记录
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
       </footer>
     
   </article>
@@ -394,7 +420,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8D%E5%8F%8D%E8%B0%83%E8%AF%95%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">定位反调试的位置</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8D%E5%8F%8D%E8%B0%83%E8%AF%95"><span class="nav-number">2.</span> <span class="nav-text">定位反调试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#patch-program"><span class="nav-number">3.</span> <span class="nav-text">Patch program</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9E%E7%BC%96%E8%AF%91"><span class="nav-number">4.</span> <span class="nav-text">回编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%BE%E5%90%8D"><span class="nav-number">5.</span> <span class="nav-text">签名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E5%AE%83%E7%9F%A5%E8%AF%86"><span class="nav-number">6.</span> <span class="nav-text">其它知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8D%E8%B0%83%E8%AF%95%E6%A3%80%E6%B5%8B"><span class="nav-number">6.1.</span> <span class="nav-text">反调试检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ida%E8%B0%83%E8%AF%95%E7%9A%84%E6%95%B4%E4%BD%93%E5%8E%9F%E7%90%86"><span class="nav-number">6.2.</span> <span class="nav-text">IDA调试的整体原理</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -410,7 +436,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -423,7 +449,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">22</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
