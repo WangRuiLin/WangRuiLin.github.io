@@ -1,6 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Android 6.0.1源码编译</title>
+    <url>/2022/05/19/Android-6-0-1%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/</url>
+    <content><![CDATA[<p>本文主要记录Android 6.0.1源码编译的过程。</p>
+<span id="more"></span>
+<p>编译环境：Ubuntu 20.04.4、Nexus 5、Android 6.0.1、磁盘空间450G+、内存8G</p>
+<h2 id="初始化编译环境">初始化编译环境</h2>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev libncurses5 libxml2-utils xsltproc unzip vim</span><br></pre></td></tr></table></figure>
+<h2 id="配置交换内存">配置交换内存</h2>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo dd if=/dev/zero of=/swapfile bs=1M count=8k</span><br><span class="line">sudo mkswap /swapfile</span><br><span class="line">sudo swapon /swapfile</span><br><span class="line">sudo swapoff /swapfile</span><br><span class="line"></span><br><span class="line">sudo apt install vim</span><br><span class="line">sudo vim /etc/fstab</span><br><span class="line">/swapfile       none    swap    sw      0       3</span><br><span class="line">reboot</span><br></pre></td></tr></table></figure>
+<h2 id="配置adb">配置adb</h2>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vim ~/.bashrc</span><br><span class="line">export ADB_PATH=/home/tom/Desktop/Android/platform-tools</span><br><span class="line">export PATH=$PATH:$ADB_PATH</span><br><span class="line">source ~/.bashrc</span><br></pre></td></tr></table></figure>
+<h2 id="配置repo">配置repo</h2>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt install curl</span><br><span class="line">curl https://mirrors.tuna.tsinghua.edu.cn/git/git-repo -o /home/tom/bin/repo</span><br><span class="line">chmod +x ~/bin/repo</span><br><span class="line"></span><br><span class="line">vim ~/.bashrc</span><br><span class="line">export REPO_PATH=/home/tom/bin</span><br><span class="line">export PATH=$PATH:$REPO_PATH</span><br><span class="line">export REPO_URL=&#x27;https://mirrors.tuna.tsinghua.edu.cn/git/git-repo&#x27;</span><br><span class="line">source ~/.bashrc</span><br></pre></td></tr></table></figure>
+<h2 id="配置anaconda3">配置anaconda3</h2>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">vim ~/.bashrc</span><br><span class="line">export ANACONDA_PATH=/home/tom/anaconda3/bin</span><br><span class="line">export PATH=$PATH:$ANACONDA_PATH</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line">conda create -n python2.7 python=2.7</span><br><span class="line">source activate</span><br><span class="line">conda activate python2.7</span><br></pre></td></tr></table></figure>
+<h2 id="配置git">配置git</h2>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt install git</span><br><span class="line">git config --global user.name &quot;tom&quot;</span><br><span class="line">git config --global user.email &quot;tom@outlook.com&quot;</span><br></pre></td></tr></table></figure>
+<h2 id="初始化厂库">初始化厂库</h2>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">repo init -u https://mirrors.tuna.tsinghua.edu.cn/git/AOSP/platform/manifest -b android-6.0.1_r77</span><br><span class="line">repo sync</span><br></pre></td></tr></table></figure>
+<p>漫长的等待，一下午and一晚上。</p>
+<h2 id="ubuntu锁屏设置">Ubuntu锁屏设置</h2>
+<p><code>Settings-&gt;Power-Never</code></p>
+<h2 id="配置openjdk">配置openjdk</h2>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">tar -xzf openjdk-7u75-b13-linux-x64-18_dec_2014.tar.gz</span><br><span class="line">mv java-se-7u75-ri/ /home/tom/bin/</span><br><span class="line">sudo vim /etc/profile</span><br><span class="line">export JAVA_HOME=/home/tom/bin/java-se-7u75-ri</span><br><span class="line">export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</span><br><span class="line">export PATH=$PATH:$JAVA_HOME/bin</span><br><span class="line">source /etc/profile</span><br><span class="line"></span><br><span class="line">sudo update-alternatives --install /usr/bin/java java /home/tom/bin/java-se-7u75-ri/bin/java 3</span><br><span class="line">sudo update-alternatives --install /usr/bin/javac javac /home/tom/bin/java-se-7u75-ri/bin/javac 3</span><br><span class="line">sudo update-alternatives --install /usr/bin/javadoc javadoc /home/tom/bin/java-se-7u75-ri/bin/javadoc 3</span><br><span class="line"></span><br><span class="line">vim build/envsetup.sh</span><br><span class="line"><span class="meta">#</span><span class="bash"> 直接搜索set_java_home 修改JAVA_HOME为/home/tom/bin/java-se-7u75-ri</span></span><br><span class="line"></span><br><span class="line">vim build/core/main.mk</span><br><span class="line">:set number</span><br><span class="line">注释掉171行的终止命令 #$(error stop)</span><br></pre></td></tr></table></figure>
+<h2 id="下载解压和安装驱动文件">下载、解压和安装驱动文件</h2>
+<p>地址：https://developers.google.com/android/drivers#hammerheadktu84p</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar -xzf broadcom-hammerhead-m4b30z-21cf8433.tgz </span><br><span class="line">tar -xzf lge-hammerhead-m4b30z-520d054d.tgz </span><br><span class="line">tar -xzf qcom-hammerhead-m4b30z-d6c0fe26.tgz </span><br><span class="line">mv ./*sh /home/tom/Desktop/SourceCode/Android6/</span><br><span class="line"></span><br><span class="line">sh extract-broadcom-hammerhead.sh</span><br><span class="line">sh extract-lge-hammerhead.sh</span><br><span class="line">sh extract-qcom-hammerhead.sh</span><br></pre></td></tr></table></figure>
+<h2 id="编译异常处理">编译异常处理</h2>
+<ol type="1">
+<li><p>修改源码<code>art/build/Android.common_build.mk</code>里的内容 <code>ifneq ($(WITHOUT_HOST_CLANG),true)  ==&gt;  ifeq ($(WITHOUT_HOST_CLANG),false)</code></p></li>
+<li><p>设置高速缓存</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">echo export USE_CCACHE=1 &gt;&gt; ~/.bashrc</span><br><span class="line">source ~/.bashrc</span><br><span class="line"></span><br><span class="line">prebuilts/misc/linux-x86/ccache/ccache -M 50G</span><br></pre></td></tr></table></figure></li>
+<li><p>报错<code>curl: option --no-proxy: used '--no-' for option that isn't a boolean</code></p>
+<p>将<code>/prebuilts/sdk/tools</code>下面的jack第128行以及<code>jack-admin</code>第123行中的<code>--no-proxy</code>改为<code>--noproxy</code></p></li>
+<li><p>其它尝试解决报错3用到的命令，可能没什么用..</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">export JACK_SERVER_VM_ARGUMENTS=&quot;-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx6g&quot;</span><br><span class="line">export LC_ALL=C</span><br><span class="line">export JACK_JAR=./out/host/linux-x86/framework/jack.jar</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="编译">编译</h2>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">make clobber</span><br><span class="line">source build/envsetup.sh</span><br><span class="line">lunch</span><br><span class="line">make -j10</span><br></pre></td></tr></table></figure>
+<p>历时1h10min，终于成功了</p>
+<h2 id="刷机命令">刷机命令</h2>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">fastboot flash boot boot.img</span><br><span class="line">fastboot flash system system.img</span><br><span class="line">fastboot flash cache cache.img</span><br><span class="line">fastboot flash userdata userdata.img</span><br></pre></td></tr></table></figure>
+<p>参考文章</p>
+<ol type="1">
+<li><a href="https://bbs.pediy.com/thread-269575.htm">[原创]源码编译（1）——Android6.0源码编译详解</a></li>
+<li><a href="https://blog.dogelabs.dev/192">curl: option --no-proxy: used '--no-' for option that isn't a boolean</a></li>
+<li><a href="https://github.com/curl/curl/issues/3906">Difference between --noproxy and --no-proxy?</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>安卓逆向</category>
+      </categories>
+      <tags>
+        <tag>源码编译</tag>
+        <tag>Android 6.0.1</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>adb常用命令</title>
     <url>/2021/10/09/adb%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</url>
     <content><![CDATA[<p>在安卓逆向过程中，经常会用到<code>adb</code>命令，本篇将记录一些<code>adb</code>命令，但自己又记不住的。</p>
