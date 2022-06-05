@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>adb常用命令</title>
+    <url>/2021/10/09/adb%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<p>在安卓逆向过程中，经常会用到<code>adb</code>命令，本篇将记录一些<code>adb</code>命令，但自己又记不住的。</p>
+<span id="more"></span>
+<ol type="1">
+<li><p>查看顶层的<code>activity</code>，这个命令我经常用来查看<code>App</code>包名</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb shell dumpsys activity top | grep ACTIVITY</span><br></pre></td></tr></table></figure></li>
+<li><p>截图。将图片保存到<code>/sdcard</code>路径下</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb shell screencap -p /sdcard/screen.png</span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <categories>
+        <category>安卓逆向</category>
+      </categories>
+      <tags>
+        <tag>adb命令</tag>
+        <tag>逆向</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Android 6.0.1源码编译</title>
     <url>/2022/05/19/Android-6-0-1%E6%BA%90%E7%A0%81%E7%BC%96%E8%AF%91/</url>
     <content><![CDATA[<p>本文主要记录Android 6.0.1源码编译的过程。</p>
@@ -56,26 +76,6 @@
       <tags>
         <tag>源码编译</tag>
         <tag>Android 6.0.1</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>adb常用命令</title>
-    <url>/2021/10/09/adb%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</url>
-    <content><![CDATA[<p>在安卓逆向过程中，经常会用到<code>adb</code>命令，本篇将记录一些<code>adb</code>命令，但自己又记不住的。</p>
-<span id="more"></span>
-<ol type="1">
-<li><p>查看顶层的<code>activity</code>，这个命令我经常用来查看<code>App</code>包名</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb shell dumpsys activity top | grep ACTIVITY</span><br></pre></td></tr></table></figure></li>
-<li><p>截图。将图片保存到<code>/sdcard</code>路径下</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb shell screencap -p /sdcard/screen.png</span><br></pre></td></tr></table></figure></li>
-</ol>
-]]></content>
-      <categories>
-        <category>安卓逆向</category>
-      </categories>
-      <tags>
-        <tag>adb命令</tag>
-        <tag>逆向</tag>
       </tags>
   </entry>
   <entry>
@@ -1760,6 +1760,382 @@ S_n=\frac{a_1*(1-q^n)}{1-q}=\frac{a_nq-a_1}{q-1}=\frac{3*\frac{1}{3}-\frac{n}{3}
       <tags>
         <tag>极客时间</tag>
         <tag>队列</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>笔记：ARM汇编基础速成</title>
+    <url>/2022/05/21/%E7%AC%94%E8%AE%B0%EF%BC%9AARM%E6%B1%87%E7%BC%96%E5%9F%BA%E7%A1%80%E9%80%9F%E6%88%90/</url>
+    <content><![CDATA[<p>本篇主要记录ARM汇编基础知识。</p>
+<span id="more"></span>
+<h2 id="arm汇编以及汇编语言基础介绍">ARM汇编以及汇编语言基础介绍</h2>
+<h3 id="arm-vs-intel">ARM vs INTEL</h3>
+<p>Intel属于复杂指令集处理器，有很多特性丰富的访问内存的复杂指令集。因此拥有更多指令代码。但是寄存器比ARM要少。复杂指令集处理器主要被应用在PC机、工作站以及服务器上。 ARM属于简单指令集处理器。只有简单的差不多100条指令集，但是会有更多的寄存器。与Intel不同，ARM的指令集仅仅操作寄存器或者是用于从内存的加载/储存过程。</p>
+<h3 id="汇编语言本质">汇编语言本质</h3>
+<p>使用汇编工具去将汇编语言转换成机器码的过程叫做汇编。</p>
+<h2 id="arm汇编中的数据类型">ARM汇编中的数据类型</h2>
+<h3 id="arm汇编数据类型基础">ARM汇编数据类型基础</h3>
+<p>被加载或者存储的数据类型可以是无符号（有符号）的字（words，四字节），半字（halfwords，两字节），或者字节。</p>
+<blockquote>
+<p>ldr = 加载字，宽度四字节 ldrh = 加载无符号的半字，宽度两字节 ldrsh = 加载有符号的半字，宽度两字节 ldrb = 加载无符号的字节 ldrsb = 加载有符号的字节 str = 存储字，宽度四字节 strh = 存储无符号的半字，宽度两字节 strsh = 存储有符号的半字，宽度两字节 strb = 存储无符号的字节 strsb = 存储有符号的字节</p>
+</blockquote>
+<h3 id="字节序">字节序</h3>
+<p>在内存中有两种字节排布顺序，大端序(BE)或者小端序(LE)。两者的主要不同是对象中的每个字节在内存中的存储顺序存在差异。一般X86中是小端序，最低的字节存储在最低的地址上。在大端机中最高的字节存储在最低的地址上。</p>
+<h3 id="arm寄存器">ARM寄存器</h3>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>别名</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>R0</td>
+<td>-</td>
+<td>通用寄存器</td>
+</tr>
+<tr class="even">
+<td>R1</td>
+<td>-</td>
+<td>通用寄存器</td>
+</tr>
+<tr class="odd">
+<td>R2</td>
+<td>-</td>
+<td>通用寄存器</td>
+</tr>
+<tr class="even">
+<td>R3</td>
+<td>-</td>
+<td>通用寄存器</td>
+</tr>
+<tr class="odd">
+<td>R4</td>
+<td>-</td>
+<td>通用寄存器</td>
+</tr>
+<tr class="even">
+<td>R5</td>
+<td>-</td>
+<td>通用寄存器</td>
+</tr>
+<tr class="odd">
+<td>R6</td>
+<td>-</td>
+<td>通用寄存器</td>
+</tr>
+<tr class="even">
+<td>R7</td>
+<td>-</td>
+<td>一般放系统调用号</td>
+</tr>
+<tr class="odd">
+<td>R8</td>
+<td>-</td>
+<td>通用寄存器</td>
+</tr>
+<tr class="even">
+<td>R9</td>
+<td>-</td>
+<td>通用寄存器</td>
+</tr>
+<tr class="odd">
+<td>R10</td>
+<td>-</td>
+<td>通用寄存器</td>
+</tr>
+<tr class="even">
+<td>R11</td>
+<td>FP</td>
+<td>栈帧指针</td>
+</tr>
+<tr class="odd">
+<td>R12</td>
+<td>IP</td>
+<td>内部程序调用</td>
+</tr>
+<tr class="even">
+<td>R13</td>
+<td>SP</td>
+<td>栈指针</td>
+</tr>
+<tr class="odd">
+<td>R14</td>
+<td>LR</td>
+<td>链接寄存器(一般存放函数返回地址)</td>
+</tr>
+<tr class="even">
+<td>R15</td>
+<td>PC</td>
+<td>程序计数寄存器</td>
+</tr>
+<tr class="odd">
+<td>CPSR</td>
+<td>-</td>
+<td>当前程序状态寄存器</td>
+</tr>
+</tbody>
+</table>
+<p>R0-R12，用来在通用操作中存储临时的值，指针等。R0被用来存储函数调用的返回值。R7经常被用作存储系统调用号。R11存放着帮助我们找到栈帧边界的指针。以及在ARM的函数调用约定中，前四个参数按顺序存放在R0-R3中。</p>
+<p>R13：SP（栈指针）。栈指针寄存器用来指向当前的栈顶。栈是一片来存储函数调用中相关数据的内存，在函数返回时会被修改为对应的栈指针，栈指针用来帮助在栈上申请数据空间。比如说你要申请一个字的大小，就会将栈指针减4，再将数据放入之前所指向的位置。</p>
+<p>R14，LR（链接寄存器）。当一个函数调用发生，链接寄存器就被用来记录函数调用发生所在位置的下一条指令的地址。这么做，允许我们快速地从子函数返回父函数。</p>
+<p>R15，PC（程序计数器）。程序计数器是一个在程序指令执行时自增的计数器。它的大小在ARM模式下总是4字节对齐，在Thumb模式下总是两字节对齐。当执行一个分支指令时，PC存储目的地址。在程序执行中，ARM模式下的PC存储着当前指令加8(两条ARM指令后)的位置，Thumb(v1)模式下PC存储着当前指令加4(两条Thumb指令)后的地址。</p>
+<h3 id="当前状态寄存器">当前状态寄存器</h3>
+<h2 id="arm模式与thumb模式">ARM模式与THUMB模式</h2>
+<p>只需要知道 你设备上的关键ARM版本所支持的Thumb指令集就可以了。以及ARM信息中心可以帮你弄清楚你的ARM版本到底是多少。</p>
+<p>Thumb也有很多不同的版本。不过不同的名字仅仅是为了区分不同版本的Thumb指令集而已（也就是对于处理器来说，这些指令永远都是Thumb指令）。</p>
+<p>Thumb-1(16位宽指令集)：在ARMv6以及更早期的版本上使用。</p>
+<p>Thumb-2(16/32位宽指令集)：在Thumb-1基础上扩展的更多的指令集(在ARMv6T2以及ARMv7即很多32位Android手机所支持的架构上使用)</p>
+<p>Thumb-EE：包括一些改变以及对于动态生成代码的补充(即那些在设备上执行前或者运行时编译的代码)</p>
+<h3 id="arm与thumb的不同之处">ARM与Thumb的不同之处</h3>
+<h3 id="arm指令集规律含义">ARM指令集规律含义</h3>
+<p>模板：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">MNEMONIC&#123;S&#125;&#123;condition&#125; &#123;Rd&#125;, Operand1, Operand2</span><br><span class="line">助记符&#123;是否使用CPSR&#125;&#123;是否条件执行以及条件&#125; &#123;目的寄存器&#125;, 操作符1, 操作符2</span><br></pre></td></tr></table></figure>
+<p>含义：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">MNEMONIC			-指令的助记符如ADD</span><br><span class="line">&#123;S&#125;						-可选的扩展位，如果指令后加了S，则需要依据计算结果更新CPSR寄存器中的条件跳转相关的FLAG</span><br><span class="line">&#123;condition&#125;		-如果机器码要被条件执行，那它需要满足的条件标示</span><br><span class="line">&#123;Rd&#125;					-存储结果的目的寄存器</span><br><span class="line">Operand1			-第一个操作数，寄存器或者是一个立即数</span><br><span class="line">Operand2			-第二个（可变的）操作数，可以是一个立即数或者寄存器或者由偏移量的寄存器</span><br></pre></td></tr></table></figure>
+<p>通用指令集：</p>
+<table>
+<thead>
+<tr class="header">
+<th>指令</th>
+<th>含义</th>
+<th>指令</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MOV</td>
+<td>移动数据</td>
+<td>EOR</td>
+<td>比特位异或</td>
+</tr>
+<tr class="even">
+<td>MVN</td>
+<td>取反码移动数据</td>
+<td>LDR</td>
+<td>加载数据</td>
+</tr>
+<tr class="odd">
+<td>ADD</td>
+<td>数据相加</td>
+<td>STR</td>
+<td>存储数据</td>
+</tr>
+<tr class="even">
+<td>SUB</td>
+<td>数据相减</td>
+<td>LDM</td>
+<td>多次加载</td>
+</tr>
+<tr class="odd">
+<td>MUL</td>
+<td>数据相乘</td>
+<td>STM</td>
+<td>多次存储</td>
+</tr>
+<tr class="even">
+<td>LSL</td>
+<td>逻辑左移</td>
+<td>PUSH</td>
+<td>压栈</td>
+</tr>
+<tr class="odd">
+<td>LSR</td>
+<td>逻辑右移</td>
+<td>POP</td>
+<td>出栈</td>
+</tr>
+<tr class="even">
+<td>ASR</td>
+<td>算术右移</td>
+<td>B</td>
+<td>分支跳转</td>
+</tr>
+<tr class="odd">
+<td>ROR</td>
+<td>循环右移</td>
+<td>BL</td>
+<td>链接分支跳转</td>
+</tr>
+<tr class="even">
+<td>CMP</td>
+<td>比较操作</td>
+<td>BX</td>
+<td>分支跳转切换</td>
+</tr>
+<tr class="odd">
+<td>AND</td>
+<td>比特位与</td>
+<td>BLX</td>
+<td>链接分支跳转切换</td>
+</tr>
+<tr class="even">
+<td>ORR</td>
+<td>比特位或</td>
+<td>SWI/SVC</td>
+<td>系统调用</td>
+</tr>
+</tbody>
+</table>
+<h2 id="arm汇编内存访问相关指令">ARM汇编内存访问相关指令</h2>
+<p>当我们加载数据到寄存器时 方括号<code>[]</code>意味着：将其中的值当做内存地址，并取这个内存地址中的值加载到对应寄存器。举例</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ldr r2, [r0]			@ 将r0所指向地址中存放的值加载到寄存器日r2中</span><br></pre></td></tr></table></figure>
+<p>当我们存储数据到内存时，方括号<code>[]</code>意味着：将其中的值当做内存地址，并向这个内存地址所指向的位置存入对应的值。举例</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">str r2, [r1]			@ 将r2中的值存放到r1所指向的地址</span><br></pre></td></tr></table></figure>
+<p>第一种偏移形式：立即数作为偏移。地址模式：用作偏移、前向索引和后向索引。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ldr r0, adr_var1			@ 将存放var1的值的地址adr_var1加载到寄存器R0中.  R0放的是地址</span><br><span class="line">ldr r1, adr_var2			@ 将存放var2的值的地址adr_var2加载到寄存器R1中.	R1放的是地址</span><br><span class="line">ldr r2, [r0]					@ 将R0所指向地址中存放的0x3加载到寄存器R2中</span><br><span class="line">str r2, [r1, #2]			@ 取址模式，基于偏移量。R2寄存器中的值0x3放到R1寄存器的值加2所指向的地址处。</span><br><span class="line">str r2, [r1, #4]!			@ 取址模式，基于索引前置修改。R2寄存器中的值0x3放到R1寄存器的值加4所指向的地址处。之后R1寄存器中存储的值加4，也就是R1=R1+4</span><br><span class="line">str r2, [r1], #4			@ 取址模式，基于索引后置修改。R2寄存器中的值0x3放到R1寄存器的值所指向的地址处。之后R1寄存器中存储的值加4，也就是R1=R1+4</span><br></pre></td></tr></table></figure>
+<p>第二种偏移形式：寄存器作为偏移。地址模式：用作偏移、前向索引和后向索引。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ldr r0, adr_var1			@ 将存放var1的值的地址adr_var1加载到寄存器R0中.  R0放的是地址</span><br><span class="line">ldr r1, adr_var2			@ 将存放var2的值的地址adr_var2加载到寄存器R1中.  R1放的是地址</span><br><span class="line">ldr r2, [r0]					@ 将R0所指向地址中存放的0x3加载到寄存器R2中</span><br><span class="line">str r2, [r1, r2]			@ 取址模式，基于偏移量。R2寄存器中的值0x3放到R1寄存器的值加R2寄存器的值所指向地址处。R1寄存器不会被修改。</span><br><span class="line">str r2, [r1, r2]!			@ 取址模式，基于索引前置修改。R2寄存器中的值0x3放到R1寄存器的值加R2寄存器的值所指向地址处。之后R1寄存器中的值被更新，也就是R1=R1+R2。</span><br><span class="line">ldr r3, [r1], r2			@ 取址模式，基于索引后置修改。R3寄存器的值是从R1寄存器的值所指向的地址中加载的。加载之后R1寄存器中的值被更新也就是R1=R1+R2</span><br></pre></td></tr></table></figure>
+<p>第三种偏移形式：寄存器缩放值作为偏移。地址模式：用作偏移、前向索引和后向索引。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ldr r0, adr_var1 					@ 将存放var1的值的地址adr_var1加载到寄存器R0中.  R0放的是地址</span><br><span class="line">ldr r1, adr_var2 					@ 将存放var2的值的地址adr_var2加载到寄存器R1中.  R1放的是地址</span><br><span class="line">ldr r2. [r0]							@ 将R0所指向地址中存放的0x3加载到寄存器R2中</span><br><span class="line">str r2, [r1, r2, LSL#2]		@ 取址模式，基于偏移量。R2寄存器中的值0x3放到R1寄存器的值加&#123;左移2位R2寄存器的值&#125;所指向地址处。R1寄存器不会被修改。</span><br><span class="line">str r2, [r1, r2, LSL#2]!	@ 取址模式，基于索引前置修改。R2寄存器中的值0x3放到R1寄存器的值加「左移2位R2寄存器的值」所指向地址处。R1寄存器的值被更新，也就是R1=R1+&#123;R2&lt;&lt;2&#125;</span><br><span class="line">ldr r3, [r1], r2, LSL#2 	@ 取址模式，基于索引后置修改。R3寄存器的值是从R1寄存器的值所指向的地址中加载的。加载之后R1寄存器的值被更新也就是R1=R1+&#123;R2&lt;&lt;2&#125;</span><br></pre></td></tr></table></figure>
+<p>总结：</p>
+<p><code>LDR/STR</code>的三种偏移模式，立即数作为偏移、寄存器作为偏移以及寄存器缩放值作为偏移。</p>
+<p>如何区分取址模式：</p>
+<ul>
+<li>如果有一个叹号<code>!</code>，那就是索引前置取址模式，即使用计算后的地址，之后更新基址寄存器</li>
+<li>如果在<code>[]</code>外有一个寄存器，那就是索引后置取址模式，即使用原有基址寄存器重的地址，之后再更新基址寄存器</li>
+<li>除此之外，就都是偏移取址模式了。</li>
+</ul>
+<h3 id="关于pc相对取址的ldr指令">关于PC相对取址的LDR指令</h3>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">.section .text</span><br><span class="line">.global _start</span><br><span class="line">_start:</span><br><span class="line">	ldr r0, =jump					@ 加载jump标签所在的内存位置到R0</span><br><span class="line">	ldr r1, =0x68DB00AD		@ 加载立即数0x68DB00AD到R1</span><br><span class="line">jump:</span><br><span class="line">	ldr r2, =511					@ 加载立即数511到R2</span><br><span class="line">	bkpt</span><br></pre></td></tr></table></figure>
+<p>这些指令学术上被称为伪指令。但我们在编写ARM汇编时可以用这种格式的指令去引用我们文字标识池中的数据。</p>
+<h3 id="在arm中使用立即数的规律">在ARM中使用立即数的规律</h3>
+<p>每条指令留给我们存放立即数的空间只有12位宽。也就是4096个不同的值。</p>
+<p>这就意味着ARM在使用MOV指令时所能操作的立即数值范围是有限的。那如果很大的话，只能拆分成多个部分外加移位操作拼接了。</p>
+<p>有效的立即数都可以通过循环移位来得到。</p>
+<p>备注：循环移位例子这块没看太懂。</p>
+<h2 id="连续存取">连续存取</h2>
+<h3 id="连续加载存储">连续加载/存储</h3>
+<p>LDM(load multiple) vs STM(store multiple)</p>
+<p><code>.word</code>标识是对内存中长度为32位的数据块做引用。程序中由<code>.data</code>段组成的数据，内存中会申请一个长度为5的4字节数组<code>array_buff</code>。我们所有内存存储操作，都是针对这段内存中的数据段做读写的。不太懂...</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">adr r0, words+12 							@ words[3]的地址 -&gt; r0   adr是小范围的地址读取伪指令</span><br><span class="line">ldr r1, array_buff_bridge			@ array_buff[0]的地址 -&gt; r1</span><br><span class="line">ldr r2, array_buff_bridge+4 	@ array_buff[2]的地址 -&gt; r2</span><br><span class="line">ldm r0, &#123;r4, r5&#125;							@ words[3] -&gt; r4 = 0x03;  words[4] -&gt; r5 = 0x4;</span><br><span class="line">stm r1, &#123;r4, r5&#125;							@ r4 -&gt; array_buff[0]; r5 -&gt; array_buff[1]</span><br></pre></td></tr></table></figure>
+<p>之前说过<code>LDM</code>和<code>STM</code>有很多形式。不同形式的扩展字符和含义都不同。</p>
+<blockquote>
+<p>IA(increase after)</p>
+<p>IB(increase before)</p>
+<p>DA(decrease after)</p>
+<p>DB(decrease before)</p>
+</blockquote>
+<p>这些扩展划分的主要依据是，作为源地址或者目的地址的指针是在访问内存前增减，还是访问内存后增减。以及，LDM与LDMIDA功能相同，都是在加载操作完成后访问对地址增加的。通过这种方式，我们可以序列化的向前或者向后从一个指针指向的内存加载数据到寄存器，或者存放数据到内存。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ldmia r0, &#123;r4-r6&#125;			@ words[3] -&gt; r4=0x3; words[4] -&gt; r5=0x4; words[5] -&gt; r6=0x5;</span><br><span class="line">stmia r1, &#123;r4-r6&#125;			@ r4 -&gt; array_buff[0]=0x3; r5 -&gt; array_buf[1]=0x4; r6 -&gt; array_buf[2]=0x5;</span><br></pre></td></tr></table></figure>
+<p>LDAIB指令首先对指向的地址先加4，然后在加载数据到寄存器中。所以第一次加载的时候也会对指针加4，所以存入寄存器的是0x4(words[4])而不是0x3(words[3])</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ldmib r0, &#123;r4-r6&#125;			@ words[4] -&gt; r4=0x4; words[5] -&gt; r5=0x5; words[6] -&gt; r6=0x6;</span><br><span class="line">stmib r1, &#123;r4-r6&#125;			@ r4 -&gt; array_buff[1]=0x4; r5 -&gt; array_buff[2]=0x5; r6 -&gt; array_buff[3]=0x6;</span><br></pre></td></tr></table></figure>
+<p>当用LDMDA指令时，执行的就是反向操作了。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ldmda r0, &#123;r4-r6&#125;			@ words[3] -&gt; r6=0x3; words[2] -&gt; r5=0x2; words[1] -&gt; r4=0x1;</span><br><span class="line">ldmdb r0, &#123;r4-r6&#125;			@ words[2] -&gt; r6=0x2; words[1] -&gt; r5=0x1; words[0] -&gt; r4=0x0;</span><br></pre></td></tr></table></figure>
+<p>同理STMDA和STMDB</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">stmda r2, &#123;r4-r6&#125;	r4</span><br><span class="line">stmdb r2, &#123;r4-r5&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="push和pop">PUSH和POP</h3>
+<p>在内存中存在一块进程相关的区域叫做栈。栈指针寄存器SP在正常情形下指向这片区域。应用经常通过栈做临时的数据存储。</p>
+<p>当PUSH压栈时，会发生以下事情。SP值减4，存放信息到SP指向的位置。<code>PUSH == STMDB sp!</code></p>
+<p>当POP出栈时，会发生以下事情。数据从SP指向位置被加载，SP值加4。<code>POP == LDMIA sp!</code></p>
+<h2 id="条件执行与分支">条件执行与分支</h2>
+<h3 id="条件执行">条件执行</h3>
+<p>条件执行用来控制程序执行跳转，或者满足条件下的特定指令的执行。相关条件在CPSR寄存器中描述。寄存器中的比特位的变化决定着不同的条件。</p>
+<h3 id="thumb模式中的条件执行">Thumb模式中的条件执行</h3>
+<p>对于Thumb中，其实也有条件执行的(Thumb-2中有)。有些ARM处理器版本支持IT指令，允许在Thumb模式下条件执行最多四条指令。</p>
+<p>格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Syntax：IT&#123;x&#123;y&#123;z&#125;&#125;&#125; cond</span><br></pre></td></tr></table></figure>
+<p><code>conda</code>代表在IT指令后第一条条件执行执行指令的需要满足的条件。</p>
+<p><code>x</code>代表着第二条条件执行指令要满足的条件逻辑相同还是相反。</p>
+<p><code>y</code>代表着第三条条件执行指令要满足的条件逻辑相同还是相反。</p>
+<p><code>z</code>代表着第四条条件执行指令要满足的条件逻辑相同还是相反。</p>
+<p><code>IT</code>指令的含义是 <code>IF-Then-Else</code>，跟这个形式类似的还有：</p>
+<p><code>IT</code>,<code>if-Then</code>, 接下来的一条指令条件执行。</p>
+<p><code>ITT</code>,<code>if-Then-Then</code>, 接下来的两条指令条件执行。</p>
+<p><code>ITE</code>,<code>if-Then-Else</code>, 接下来的两条指令条件执行。</p>
+<p><code>ITTE</code>, <code>if-Then-Then-Else</code>, 接下来的三条指令条件执行。</p>
+<p><code>ITTEE</code>, <code>if-Then-Then-Else-Else</code>, 接下来的四条指令条件执行。</p>
+<p>在IT块中的每一条条件执行指令必须是相同逻辑条件或者相反逻辑条件。比如说ITE指令，第一条和第二条指令必须使用相同的条件，而第三条必须是与前两条逻辑相反的条件。</p>
+<h3 id="分支指令">分支指令</h3>
+<p>分支指令(也叫分支跳转)允许我们在代码中跳转到别的段。当我们需要跳到一些函数上执行或者跳过一些代码块时很有用。这部分的最佳例子就是条件跳转IF以及循环。</p>
+<p>备注：比较简单</p>
+<h3 id="bbxblx">B/BX/BLX</h3>
+<p>B(Branch)，简单的跳转到一个函数</p>
+<p>BL(Branch Link)，将下一条指令的入口(PC+4)保存到LR，跳转到函数。备注(LR链接寄存器，一般存放函数返回地址)</p>
+<p>BX(Branch exchange)以及BLX(Branch Link exchange)，与B/BL相同，外加执行模式切换(ARM与Thumb)。需要寄存器类型作为第一操作数。</p>
+<p>BX/BLX指令被用来从ARM模式切换到Thumb模式。</p>
+<h3 id="条件分支指令">条件分支指令</h3>
+<p>条件分支指令是指在满足某种特定条件下的跳转指令。指令模式是跳转指令后加上条件后缀。</p>
+<p>通过BEQ来举例。</p>
+<h2 id="栈与函数">栈与函数</h2>
+<p>研究一片独特的内存区域叫做栈，讲解栈的目的以及相关操作。除此之外，还会研究ARM架构中函数的调用约定。</p>
+<h3 id="栈">栈</h3>
+<p>一般来说，栈是一片在程序/进程中的内存区域。这部分内存是在进程创建的时候被创建的。我们利用栈来存储一些临时数据，比如函数的局部变量，环境变量等。</p>
+<p>了解栈的相关知识以及其实现方式。首先谈谈栈的增长，即当我们把32位的数据放到栈上时候它的变化。栈可以向上增长(当栈的实现是负向增长时)，或者向下增长(当栈的实现是正向增长时)。具体的关于下一个32位数据被放到哪里是由栈指针来决定的，更精确的说是由SP寄存器决定。不过这里面所指向的位置，可能是当前(也就是上一次)存储的数据，也可能是下一次存储时的位置。如果SP当前指向上一次存放的数据在栈中的位置(满栈实现)，SP将会递减(降序栈)或者递增(升序栈)，然后再对指向的内容进行操作。而如果SP指向的是下一次要操作的数据的空闲位置(空栈实现)，数据会先被存放，然后SP会被递增(升序栈)或递减(降序栈)。</p>
+<p>不同的栈实现，可以用不同情形下的多次存取指令来表示。很绕。</p>
+<table>
+<thead>
+<tr class="header">
+<th>栈类型</th>
+<th>压栈</th>
+<th>出栈</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>满栈降序(FD Full descending)</td>
+<td>STMFD(等价于STMDB，操作之前递减)</td>
+<td>LDMFD(等价于LDM，操作之后递加)</td>
+</tr>
+<tr class="even">
+<td>满栈升序(FA Full ascending)</td>
+<td>STMFA(等价于STMIB，操作之前递增)</td>
+<td>LDMFA(等价于LDMDA，操作之后递减)</td>
+</tr>
+<tr class="odd">
+<td>空栈降序(ED Empty descending)</td>
+<td>STMED(等价于STMDA，操作之后递减)</td>
+<td>LDMED(等价于LDMIB，操作之前递加)</td>
+</tr>
+<tr class="even">
+<td>空栈升序(EA Empty ascending)</td>
+<td>STMEA(等价于STM，操作之后递增)</td>
+<td>LDMEA(等价于LDMDB，操作之前递减)</td>
+</tr>
+</tbody>
+</table>
+<p>栈被用来存储局部变量，之前的寄存器状态。为了统一管理，函数使用了栈帧这个概念，栈帧是在栈内用于存储函数相关数据的特定区域。栈帧在函数开始时被创建。栈帧指针FP指向栈帧的底部元素，栈帧指针确定后，会在栈上申请栈帧所属的缓冲区。栈帧(从它的底部算起)一般包含这返回地址(之前说的LR)，上一层函数的栈帧指针，以及任何需要被保存的寄存器，函数参数(当函数需要4个以上参数时)，局部变量等。虽然栈帧包含着很多数据，但是不少类型已经了解过了。最后，栈帧在函数结束时被销毁。</p>
+<h3 id="函数">函数</h3>
+<p>一个函数的结构：序言准备、函数体以及结束收尾。</p>
+<p>序言的目的是为了保存之前程序的执行状态(通过存储LR以及R11到栈上)以及设定栈以及局部函数变量。这些步骤的实现可能根据编译器的不同有差异。通常来说使用PUSH/ADD/SUB这些指令。举个例子</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">push &#123;r11, lr&#125;			@ 保存R11和LR</span><br><span class="line">add r11, sp, #4			@ 设置栈帧底部，SP+4后指向栈帧底部元素</span><br><span class="line">sub sp, sp, #16			@ 在栈上申请相应空间</span><br></pre></td></tr></table></figure>
+<p>函数体部分就是函数本身要完成的任务了。这部分包括了函数自身的指令，或者跳转其它函数等。下面是函数体的例子</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mov r0, #1 			@ 设置局部变量a=1，同时也是为函数max准备参数a</span><br><span class="line">mov r1, #2			@ 设置局部变量b=2，同时也是为函数max准备参数b</span><br><span class="line">bl max 					@ 分支跳转调用函数max</span><br></pre></td></tr></table></figure>
+<p>上面的代码也展示了调用函数前需要如何准备局部变量，以及函数调用设定参数。一般情况下，前四个参数通过R0-R3来传递，而多出来的参数则需要通过栈来传递。函数调用结束后，返回值存放在R0寄存器中。所以不管max函数如何运作，我们都可以通过R0来得知返回值。而且当返回值位是64位值时，使用的是R0与R1寄存器一同存储64位的值。</p>
+<p>函数的最后一部分即结束收尾，这一部分主要是用来恢复程序寄存器以及回到函数调用发生之前的状态。我们先恢复SP栈指针，这个可以通过之前保存的栈帧指针寄存器外加一些加减操作做到(保证回到FP,LR的出栈位置)。而当我们重新调整了栈指针后，我们就可以通过出栈操作恢复之前保存的寄存器的值。基于函数类型的不同，POP指令有可能是结束收尾的最后一条指令。然而，在恢复后我们可能还需要通过BX指令离开函数。一个收尾的样例代码是这样的。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sub sp, r11, #4			@ 收尾操作开始。调整栈指针，有两个寄存器要POP，所以从栈帧底部元素再减4</span><br><span class="line">pop &#123;r11, pc&#125; 			@ 收尾操作结束。恢复之前函数的栈帧指针，以及通过之前保存的LR来恢复PC</span><br></pre></td></tr></table></figure>
+<p>总结：</p>
+<ol type="1">
+<li>序言设定函数环境</li>
+<li>函数体实现函数逻辑功能，将结果存到R0</li>
+<li>收尾恢复程序状态，回到调用发生的地方</li>
+</ol>
+<p>关于函数，有一个关键点我们要知道，函数的类型分为叶函数和非叶函数。</p>
+<ul>
+<li>叶函数是指函数中没有分支跳转到其它函数指令的函数。</li>
+<li>非叶函数指包含跳转到其它函数的分支跳转指令的函数。</li>
+</ul>
+<p>序言期主要的差别，非叶函数需要在栈上保存更多的寄存器，这是由于非叶函数的本质决定的，因为在执行时LR寄存器会被修改，所以需要保存LR寄存器以便之后恢复。当然如果有必要也可以在序言期保存更多的寄存器。叶函数与非叶函数在收尾时的差异主要是在于，叶函数的结尾直接通过LR中的值跳转回去就好，而非叶函数需要先通过POP恢复LR寄存器，再进行分支跳转。</p>
+<p>再次强调一下在函数BL和BX指令的使用。在我们的示例中，通过使用BL指令跳转到叶函数中。在汇编代码中我们使用了标签。在编译过程中，标签被转换成对应的内存地址。在跳转到对应位置之前，BL会将下一条指令的地址存储到LR寄存器中，这样我们就能在函数max完成的时候返回了。</p>
+<p>BX指令在被用在我们离开一个叶函数时，使用LR作为寄存器参数。刚刚说了LR存放着函数调用返回后下一条指令的地址。由于叶函数不会在执行时修改LR寄存器，所以就可以通过LR寄存器跳转返回main函数了。通过BX指令还会帮助我们切换ARM/Thumb模式。同样这也通过LR寄存器的最低比特位来完成。0代表ARM模式，1代表Thumb模式。</p>
+<p>参考文章：</p>
+<ol type="1">
+<li><a href="https://www.anquanke.com/post/id/86383">【系列分享】ARM 汇编基础速成1：ARM汇编以及汇编语言基础介绍</a></li>
+<li><a href="https://www.anquanke.com/post/id/86393">【系列分享】ARM 汇编基础速成2：ARM汇编中的数据类型</a></li>
+<li><a href="https://www.anquanke.com/post/id/86401">【系列分享】ARM 汇编基础速成3：ARM模式与THUMB模式</a></li>
+<li><a href="https://www.anquanke.com/post/id/86406">【系列分享】ARM 汇编基础速成4：ARM汇编内存访问相关指令</a></li>
+<li><a href="https://www.anquanke.com/post/id/86416">【系列分享】ARM 汇编基础速成5：连续存取</a></li>
+<li><a href="https://www.anquanke.com/post/id/86422">【系列分享】ARM 汇编基础速成6：条件执行与分支</a></li>
+<li><a href="https://www.anquanke.com/post/id/86434">【系列分享】ARM 汇编基础速成7：栈与函数</a></li>
+</ol>
+]]></content>
+      <categories>
+        <category>安卓逆向</category>
+      </categories>
+      <tags>
+        <tag>ARM汇编基础</tag>
       </tags>
   </entry>
 </search>
